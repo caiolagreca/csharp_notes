@@ -304,5 +304,6 @@ class Car : Vehicle
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
-#   c s h a r p _ n o t e s  
+#   c s h a r p _ n o t e s 
+ 
  
