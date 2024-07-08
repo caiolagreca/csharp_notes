@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\bin\Debug\net8.0\Structures.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\bin\Debug\net8.0\Structures.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\bin\Debug\net8.0\Structures.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\bin\Debug\net8.0\Structures.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\bin\Debug\net8.0\Structures.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\refint\Structures.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\Structures.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Structures\obj\Debug\net8.0\ref\Structures.dll

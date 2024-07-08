@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\bin\Debug\net8.0\Classes.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\bin\Debug\net8.0\Classes.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\bin\Debug\net8.0\Classes.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\bin\Debug\net8.0\Classes.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\bin\Debug\net8.0\Classes.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\refint\Classes.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\Classes.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Classes\obj\Debug\net8.0\ref\Classes.dll

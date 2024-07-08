@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\bin\Debug\net8.0\IfStatements.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\bin\Debug\net8.0\IfStatements.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\bin\Debug\net8.0\IfStatements.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\bin\Debug\net8.0\IfStatements.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\bin\Debug\net8.0\IfStatements.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\refint\IfStatements.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\IfStatements.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\IfStatements\obj\Debug\net8.0\ref\IfStatements.dll

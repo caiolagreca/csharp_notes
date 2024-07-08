@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\bin\Debug\net8.0\StringLiteral.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\bin\Debug\net8.0\StringLiteral.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\bin\Debug\net8.0\StringLiteral.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\bin\Debug\net8.0\StringLiteral.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\bin\Debug\net8.0\StringLiteral.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\refint\StringLiteral.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\StringLiteral.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\StringLiteral\obj\Debug\net8.0\ref\StringLiteral.dll
