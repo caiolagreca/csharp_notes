@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\bin\Debug\net8.0\Enums.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\bin\Debug\net8.0\Enums.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\bin\Debug\net8.0\Enums.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\bin\Debug\net8.0\Enums.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\bin\Debug\net8.0\Enums.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\refint\Enums.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\Enums.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Enums\obj\Debug\net8.0\ref\Enums.dll

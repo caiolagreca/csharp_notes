@@ -301,9 +301,497 @@ class Car : Vehicle
 //Output - 'Car': cannot derive from sealed type 'Vehicle'
 ```
 
+# Polymorphism and Overriding Methods:
+
+Polymorphism allos us to use inheritanced methods to perform a single action in a different ways.
+To override the base class method, we have to add the virtual keyword to the method inside the base class, and the override keyword for each derived class methods:
+
+```csharp
+class Animal  // Base class (parent)
+{
+  public virtual void animalSound()
+  {
+    Console.WriteLine("The animal makes a sound");
+  }
+}
+
+class Pig : Animal  // Derived class (child)
+{
+  public override void animalSound()
+  {
+    Console.WriteLine("The pig says: wee wee");
+  }
+}
+
+class Dog : Animal  // Derived class (child)
+{
+  public override void animalSound()
+  {
+    Console.WriteLine("The dog says: bow wow");
+  }
+}
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Animal myAnimal = new Animal();  // Create a Animal object
+    Animal myPig = new Pig();  // Create a Pig object
+    Animal myDog = new Dog();  // Create a Dog object
+
+    myAnimal.animalSound();
+    myPig.animalSound();
+    myDog.animalSound();
+  }
+}
+```
+
+# Abstract Classes and Methods:
+
+Data abstraction is the process of hiding certain details and showing only essential information to the user.
+Abstraction can be achieved with either abstract classes or interfaces.
+
+Abstract class: is a restricted class that cannot be used to create objects (to access it, it must be inherited from another class).
+An abstract class can have both abstract and regular methods.
+
+Abstract method: can only be used in an abstract class, and it does not have a body. The body is provided by the derived class (inherited from).
+
+```csharp
+abstract class Animal
+{
+    // Abstract method (does not have a body)
+    public abstract void animalSound();
+
+    // Regular method
+    public void sleep()
+    {
+        Console.WriteLine("Zzz");
+    }
+}
+
+// Derived class (inherit from Animal)
+class Pig : Animal
+{
+  public override void animalSound()
+  {
+    // The body of animalSound() is provided here
+    Console.WriteLine("The pig says: wee wee");
+  }
+}
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Pig myPig = new Pig(); // Create a Pig object
+    myPig.animalSound();  // Call the abstract method
+    myPig.sleep();  // Call the regular method
+  }
+}
+```
+
+# Interfaces:
+
+Like abstract classes, interfaces cannot be used to create objects (in the example above, it is not possible to create an "IAnimal" object in the Program class).
+It is considered good practice to start with the letter "I" at the beginning of an interface, as it makes it easier for yourself and others to remember that it is an interface and not a class.
+You do not have to use the override keyword when implementing an interface.
+Interface methods do not have a body - the body is provided by the "implement" class.
+On implementation of an interface, you must override all of its methods.
+Interfaces can contain properties and methods, but not fields/variables.
+Interface members are by default abstract and public.
+An interface cannot contain a constructor (as it cannot be used to create objects).
+
+```csharp
+// Interface
+interface IAnimal
+{
+  void animalSound(); // interface method (does not have a body)
+}
+
+// Pig "implements" the IAnimal interface
+class Pig : IAnimal
+{
+  public void animalSound()
+  {
+    // The body of animalSound() is provided here
+    Console.WriteLine("The pig says: wee wee");
+  }
+}
+
+class Program
+{
+  static void Main(string[] args)
+  {
+    Pig myPig = new Pig();  // Create a Pig object
+    myPig.animalSound();
+  }
+}
+```
+
+- Multiple Interfaces:
+  C# does not support "multiple inheritance" (a class can only inherit from one base class). However, it can be achieved with interfaces, because the class can implement multiple interfaces. Note: To implement multiple interfaces, separate them with a comma.
+
+```csharp
+interface IFirstInterface
+{
+    void myMethod(); // interface method
+}
+
+interface ISecondInterface
+{
+    void myOtherMethod(); // interface method
+}
+
+// Implement multiple interfaces
+class DemoClass : IFirstInterface, ISecondInterface
+{
+    public void myMethod()
+    {
+        Console.WriteLine("Some text..");
+    }
+    public void myOtherMethod()
+    {
+        Console.WriteLine("Some other text...");
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        DemoClass myObj = new DemoClass();
+        myObj.myMethod();
+        myObj.myOtherMethod();
+    }
+}
+```
+
+# Enums:
+
+An enum is a special "class" that represents a group of constants (unchangeable/read-only variables).
+To create an enum, use the enum keyword (instead of class or interface), and separate the enum items with a comma.
+Use enums when you have values that you know aren't going to change, like month days, days, colors, deck of cards, etc.
+
+```csharp
+class Program
+{
+  enum Level
+  {
+    Low,
+    Medium,
+    High
+  }
+  static void Main(string[] args)
+  {
+    Level myVar = Level.Medium;
+    Console.WriteLine(myVar);
+  }
+}
+```
+
+- Enum Values:
+  By default, the first item of an enum has the value 0. The second has the value 1, and so on.
+  To get the integer value from an item, you must explicitly convert the item to an int
+
+```csharp
+enum Months
+{
+  January,    // 0
+  February,   // 1
+  March,      // 2
+  April,      // 3
+  May,        // 4
+  June,       // 5
+  July        // 6
+}
+
+static void Main(string[] args)
+{
+  int myNum = (int) Months.April;
+  Console.WriteLine(myNum);
+}
+```
+
+You can also assign your own enum values, and the next items will update their numbers accordingly:
+
+```csharp
+enum Months
+{
+  January,    // 0
+  February,   // 1
+  March=6,    // 6
+  April,      // 7
+  May,        // 8
+  June,       // 9
+  July        // 10
+}
+
+static void Main(string[] args)
+{
+  int myNum = (int) Months.April;
+  Console.WriteLine(myNum);
+}
+```
+
+# Working with Files:
+
+The File class from the System.IO namespace, allows us to work with files.
+
+Method - Description
+AppendText() - Appends text at the end of an existing file
+Copy() - Copies a file
+Create() - Creates or overwrites a file
+Delete() - Deletes a file
+Exists() - Tests whether the file exists
+ReadAllText() - Reads the contents of a file
+Replace() - Replaces the contents of a file with the contents of another file
+WriteAllText() - Creates a new file and writes the contents to it. If the file already exists, it will be overwritten.
+
+```csharp
+using System.IO;  // include the System.IO namespace
+
+string writeText = "Hello World!";  // Create a text string
+File.WriteAllText("filename.txt", writeText);  // Create a file and write the content of writeText to it
+
+string readText = File.ReadAllText("filename.txt");  // Read the contents of the file
+Console.WriteLine(readText);  // Output the content
+```
+
+# O que sao Records:
+
+Implementado no C# 9.0. Traz uma nova maneira de definir tipos de dados imutavies, otimizados para igualdade de valor. Sao uteis para modelar dados e objetos que nao devem mudar apos a criacao.
+
+Comparação entre Classe e Record:
+Característica - Classe - Record
+Mutabilidade - Mutável por padrão - Imutável por padrão
+Igualdade - Comparação por referência - Comparação por valor
+Sintaxe - Sintaxe completa para definir propriedades e construtores - Sintaxe simplificada para propriedades e construtores
+Uso Comum - Objetos que representam entidades com comportamento e estado mutável - Objetos que representam dados imutáveis e modelagem de dados
+Clonagem - Implementação manual de métodos de clonagem - Implementação automática de métodos de clonagem (with expression)
+
+Classes são melhores para cenários onde você precisa de objetos mutáveis com comportamentos e métodos.
+
+```csharp
+public class MutablePerson
+{
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+
+    public MutablePerson(string firstName, string lastName)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+    }
+}
+
+// Uso
+var person1 = new MutablePerson("John", "Doe");
+var person2 = person1;
+person2.FirstName = "Jane";
+
+// person1 e person2 são iguais porque referem-se ao mesmo objeto
+Console.WriteLine(person1.FirstName); // Saída: Jane
+```
+
+Records são ideais para cenários onde você está modelando dados imutáveis e precisa de igualdade de valor.
+
+```csharp
+public record Person(string FirstName, string LastName);
+
+// Uso
+var person1 = new Person("John", "Doe");
+var person2 = person1 with { FirstName = "Jane" };
+
+// person1 e person2 são diferentes
+Console.WriteLine(person1.FirstName); // Saída: John
+Console.WriteLine(person2.FirstName); // Saída: Jane
+```
+
+# O que sao DTOs?
+
+Um DTO (Data Transfer Object) é um padrão de design usado para transferir dados entre camadas de um aplicativo, especialmente em arquiteturas de software onde é necessário passar dados entre o cliente e o servidor, ou entre diferentes partes de um sistema. O principal objetivo de um DTO é transportar dados sem comportamento, ou seja, sem lógica de negócios.
+
+Características dos DTOs
+Simples e Sem Comportamento: DTOs contêm apenas propriedades e não possuem métodos ou lógica de negócios.
+Usados para Transferência de Dados: São usados principalmente para transportar dados entre camadas ou sistemas.
+Desacoplamento: Ajudam a desacoplar as camadas do sistema, especialmente em aplicações distribuídas, como aquelas que usam APIs RESTful.
+Serialização e Desserialização: Facilitam a serialização e desserialização de dados, o que é útil para comunicação entre sistemas diferentes, como entre um cliente e um servidor via JSON ou XML.
+
+Exemplo:
+
+```csharp
+//Primeiro, definimos a entidade de domínio, que pode conter lógica de negócios.
+public class User
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+
+    public string GetFullName()
+    {
+        return $"{FirstName} {LastName}";
+    }
+}
+
+//Agora, definimos um DTO para transferir dados do usuário sem a lógica de negócios.
+public class UserDto
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+}
+```
+
+# Lambda Expressions:
+
+Sao funcoes anonimas, semelhantes ao arrow function em JS.
+Usada em LINQ, callbacks, middleware...
+Sintaxe:
+
+```csharp
+(parameters) => expression
+(parameters) => { statement; }
+```
+
+Exemplos:
+
+```csharp
+//Filtro de Numeros paraes
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+var evenNumbers = numbers.Where(n => n % 2 == 0).ToList();
+evenNumbers.ForEach(n => Console.WriteLine(n));
+```
+
+```csharp
+//Callback em Event Listener
+using System;
+
+public class Button
+{
+    public event EventHandler Click;
+
+    public void SimulateClick()
+    {
+        Click?.Invoke(this, EventArgs.Empty);
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Button button = new Button();
+        button.Click += (sender, e) => Console.WriteLine("Button was clicked!");
+        button.SimulateClick();
+    }
+}
+```
+
+# Delegates:
+
+Permitem que metodos sejam passados como parametros e sao armazenados em variaveis.
+
+Características dos Delegates
+Tipo Seguro: garantem que apenas métodos com a assinatura correspondente possam ser atribuídos a eles.
+Multicast: podem referenciar mais de um método, permitindo chamar vários métodos com uma única invocação de delegate.
+Base para Eventos: são a base para a implementação de eventos.
+
+When to use? When we need to pass a method as a parameter(arguments) to other methods. (Callback function)
+
+Example:
+
+```csharp
+delegate void PrintDelegate(string text);
+
+
+//Delegate Method
+PrintDelegate PrintConsole = (string text) => {
+  Console.WriteLine(text);
+};
+
+//Delegate Method
+PrintDelegate PrintToFile = (string text) => {
+  File.AppendAllText("./logs.txt", text);
+};
+
+//Method that will callback the Delegate
+static void ConnectToDatabase(PrintDelegate log)
+{
+  log("Insert new record to db");
+  log("The record was done");
+}
+
+ConnectToDatabase(PrintToFile);
+```
+
+Other Example:
+
+```csharp
+public delegate void StringDelegate(string  text);
+
+public class Program
+{
+  static void Main(string[] args)
+  {
+    StringDelegate stringDelegate = ToUpperCase;
+    WriteOutput("This is a lowercase string", stringDelegate);
+  }
+
+  static void ToUpperCase(string text) => Console.WriteLine(text.ToUpper());
+  static void ToLowerCase(string text) => Console.WriteLine(text.ToLower());
+
+  static void WriteOutput(string text, StringDelegate ToUpperCase)
+  {
+    Console.WriteLine("$Before: {text}");
+    stringDelegate(text);
+  }
+}
+/* OUTPUT
+Before: this is a lowercase string
+THIS IS A LOWERCASE STRTNG
+ */
+```
+
+Built in Delegates:
+
+1. Func: T Method (T1 ...T16);
+   This Delegate takes a type and can take from 0 to 16 input parameters of any object type
+   Declaring it:
+
+```csharp
+// The last parameter is always the return type. So in the case bellow the Func Delegate has a string parameter and a string as return.
+// The pointer is the variable name
+Func<string, string> pointer = SomeMethod;
+
+string SomeMethod(String str){
+//...logic of method
+}
+//To invoke the reference method, there are two options:
+pointer("Hello World");
+pointer.Invoke("Hello World");
+
+//We can use with Lambda expression as well:
+Func<string, string> pointer = (str) => "$" + str;
+```
+
+2. Action: - void Method(T1 ... T16);
+   Is the same as Func Delegate, but it doens't return any type.
+
+```csharp
+Action<string, string> //Both are input parameters
+
+Array.ForEach(Action<T>)
+```
+
+3. Predicate: - bool Method(T1);
+   It takes only one parameter of any type and always return a boolean.
+
+```csharp
+Predicate<int>
+```
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
-#   c s h a r p _ n o t e s 
- 
- 

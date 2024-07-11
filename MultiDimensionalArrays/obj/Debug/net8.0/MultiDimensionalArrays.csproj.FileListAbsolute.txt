@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\bin\Debug\net8.0\MultiDimensionalArrays.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\bin\Debug\net8.0\MultiDimensionalArrays.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\bin\Debug\net8.0\MultiDimensionalArrays.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\bin\Debug\net8.0\MultiDimensionalArrays.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\bin\Debug\net8.0\MultiDimensionalArrays.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\refint\MultiDimensionalArrays.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\MultiDimensionalArrays.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\MultiDimensionalArrays\obj\Debug\net8.0\ref\MultiDimensionalArrays.dll
