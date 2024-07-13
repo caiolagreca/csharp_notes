@@ -393,13 +393,26 @@ class Program
 # Interfaces:
 
 Like abstract classes, interfaces cannot be used to create objects (in the example above, it is not possible to create an "IAnimal" object in the Program class).
+
+Makes your code more modular.
+
 It is considered good practice to start with the letter "I" at the beginning of an interface, as it makes it easier for yourself and others to remember that it is an interface and not a class.
+
 You do not have to use the override keyword when implementing an interface.
+
 Interface methods do not have a body - the body is provided by the "implement" class.
+
 On implementation of an interface, you must override all of its methods.
+
 Interfaces can contain properties and methods, but not fields/variables.
+
 Interface members are by default abstract and public.
+
 An interface cannot contain a constructor (as it cannot be used to create objects).
+
+Like said before, but in other words: Interfaces can not story any data.
+
+In new csharp versions you can add optional default implementation, meaning that you can add a logic into the Method() of the Interface and don't be obligate to implement in the class that uses the interface (it will automatically use the default method implemented in the interface). But remember, to use that, you must implement something into the Method in the Interface. (take a look at the Interface Folder Example )
 
 ```csharp
 // Interface
@@ -790,6 +803,56 @@ Array.ForEach(Action<T>)
 
 ```csharp
 Predicate<int>
+```
+
+# Params:
+
+When you have a method and wants to receive any number of parameters, use the "params" keyword
+
+```csharp
+public class Program {
+
+  static void Main (string[] args)
+  {
+    PrintPlayerName(35, "Caio", "Niedja", "Rodrigo");
+  }
+
+  private static void PrintPlayerName(int age, params string[] playerNameArray)
+  {
+    Console.WriteLine(playerNameArray.Length);
+  }
+}
+```
+
+# Values x Reference Types:
+
+One works as a copy, the other as a reference.
+
+Values types (contain tbeir data):
+int, float, bool, enum, struct.
+a variable points to one value, so if you assign this variable to another variable, you are making a copy.
+Can´t be null.
+
+```csharp
+int a = 7;
+int b = a;
+b = 5;
+
+Console.WriteLine(a); //7
+```
+
+Reference types (stores references to their data):
+class, object, array, strings (sometimes strings can be values types).
+Can have multiple variables pointing to the same reference type.
+Can be null.
+
+```csharp
+MyClass myClass = new MyClass();
+myClass.a = 7;
+MyClass mySecondClass = myClass();
+mySecondClass.a = 5;
+
+Console.WriteLine(myClass.a); //5
 ```
 
 # Extra Notes:
