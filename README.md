@@ -705,6 +705,7 @@ public class Program
 # Delegates:
 
 Permitem que metodos sejam passados como parametros e sao armazenados em variaveis.
+Eh basicamente a assinatura de um metodo e sera gerada uma variavel para essa assinatura. Essa variavel, assoiada a uma assinatura de um metodo recebera algum metodo. Isso vai fazer com que esse metodo possa ser passado como uma variavel (passado atraves de parametros).
 
 Características dos Delegates
 Tipo Seguro: garantem que apenas métodos com a assinatura correspondente possam ser atribuídos a eles.
