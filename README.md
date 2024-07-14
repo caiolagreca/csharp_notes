@@ -856,6 +856,114 @@ mySecondClass.a = 5;
 Console.WriteLine(myClass.a); //5
 ```
 
+# Partial classes:
+
+Permite que você divida a definição de uma classe, estrutura ou interface em vários arquivos. Todos os fragmentos devem ser combinados em uma única definição quando o programa é compilado.
+Não podem haver membros duplicados (métodos, propriedades, etc.) nas partes de uma classe parcial.
+Todas as partes da classe parcial devem ter os mesmos modificadores de acesso (public, private, etc.).
+Todas as partes devem estar no mesmo namespace.
+
+```csharp
+//Arquivo 1: Parte1.cs
+namespace MinhaApp
+{
+    public partial class MinhaClasse
+    {
+        public void Metodo1()
+        {
+            Console.WriteLine("Método 1");
+        }
+    }
+}
+
+//Arquivo 2: Parte2.cs
+namespace MinhaApp
+{
+    public partial class MinhaClasse
+    {
+        public void Metodo2()
+        {
+            Console.WriteLine("Método 2");
+        }
+    }
+}
+```
+
+# readonly:
+
+const:
+
+Um campo const é uma constante de tempo de compilação, o que significa que seu valor deve ser conhecido e definido no momento da compilação.
+O valor de um const é fixo e não pode ser alterado. Além disso, ele é implícito como static, ou seja, pertence à classe e não à instância da classe.
+Deve ser inicializado no momento da declaração e não pode ser modificado posteriormente.
+
+readonly:
+
+Um campo readonly é uma constante de tempo de execução, o que significa que seu valor pode ser definido em tempo de execução, mas somente no momento da inicialização do campo ou dentro do construtor da classe.
+O valor de um campo readonly pode ser diferente para diferentes instâncias da classe, porque ele pode ser inicializado dentro de um construtor de instância.
+Pode ser inicializado na declaração ou no construtor, mas não pode ser alterado depois de inicializado.
+
+Quando Usar const e readonly:
+
+Use const quando o valor da constante é conhecido em tempo de compilação e não vai mudar.
+Use readonly quando o valor só pode ser determinado em tempo de execução, geralmente passado como argumento para o construtor.
+
+<!-- OLHAR EXEMPLO NO FOLDER READONLY -->
+
+# IEnumerabale e IEnumerator:
+
+Faz com que classes personalizadas (que voce criou) possam utilizar o foreach. Tradicionalmente voce utiliza foreach em Lists, Arrays, mas nao em uma classe na qual voce criou.
+
+- IEnumerable:
+  é uma interface que define um único método GetEnumerator, que retorna um objeto de tipo IEnumerator.
+  Serve para fornecer uma maneira de iterar sobre uma coleção de objetos. É a interface base para todas as coleções que podem ser enumeradas usando foreach.
+  Método principal: IEnumerator GetEnumerator()
+
+- IEnumerator:
+  é uma interface que define os métodos necessários para percorrer uma coleção.
+  Serve para iterar sobre a coleção, fornecendo a capacidade de acessar elementos na coleção um por um.
+  Métodos principais:
+  bool MoveNext(): Move para o próximo elemento na coleção.
+  object Current { get; }: Obtém o elemento na posição atual.
+  void Reset(): Redefine a enumeração para sua posição inicial.
+
+- GetEnumerator:
+  é um método definido pela interface IEnumerable.
+  Ele retorna um enumerador (IEnumerator) que permite iterar sobre a coleção.
+  Quando você usa foreach para iterar sobre uma coleção, o compilador C# chama implicitamente GetEnumerator para obter um enumerador que será usado para iterar sobre os elementos da coleção.
+
+- MoveNext():
+  é um método definido pela interface IEnumerator.
+  Ele avança o enumerador para o próximo elemento na coleção. Retorna true se o enumerador foi avançado com sucesso, ou false se o enumerador já passou do final da coleção.
+  Em um loop foreach, MoveNext é chamado repetidamente para avançar o enumerador através da coleção.
+
+- Current:
+  é uma propriedade definida pela interface IEnumerator.
+  Ele retorna o elemento na posição atual do enumerador.
+  Em um loop foreach, Current é chamado após cada chamada bem-sucedida de MoveNext para obter o elemento atual.
+
+- Reset():
+  é um método definido pela interface IEnumerator.
+  Ele redefine o enumerador para sua posição inicial, que é antes do primeiro elemento na coleção.
+  Na maioria dos cenários de uso de foreach, Reset não é chamado explicitamente. Ele é mais útil em cenários em que você precisa reutilizar o mesmo enumerador para iterar novamente sobre a coleção.
+
+- Fluxo de Iteração com foreach:
+
+  1. Início do foreach:
+     O compilador chama GetEnumerator na coleção para obter um enumerador.
+  2. Primeira Iteração:
+     MoveNext é chamado para mover o enumerador para o primeiro elemento.
+     Se MoveNext retornar true, Current é chamado para obter o primeiro elemento.
+  3. Iterações Subsequentes:
+     MoveNext é chamado repetidamente para mover o enumerador para os próximos elementos.
+     Após cada chamada bem-sucedida de MoveNext, Current é chamado para obter o elemento atual.
+  4. Fim da Iteração:
+     Quando MoveNext retornar false, o loop foreach termina.
+
+- Implementação: Crie uma classe que implementa IEnumerable e outra classe aninhada que implementa IEnumerator para fornecer a lógica de iteração.
+
+<!-- OLHAR EXEMPLO NO FOLDER IENUMERABLE -->
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.

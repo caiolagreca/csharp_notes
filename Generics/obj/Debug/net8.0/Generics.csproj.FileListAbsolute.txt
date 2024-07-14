@@ -1,0 +1,15 @@
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\bin\Debug\net8.0\Generics.exe
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\bin\Debug\net8.0\Generics.deps.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\bin\Debug\net8.0\Generics.runtimeconfig.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\bin\Debug\net8.0\Generics.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\bin\Debug\net8.0\Generics.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.AssemblyInfoInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.AssemblyInfo.cs
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.csproj.CoreCompileInputs.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.sourcelink.json
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\refint\Generics.dll
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.pdb
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\Generics.genruntimeconfig.cache
+C:\Users\Caio\Desktop\Docs\Web Develop\Projects\C#\VSCodeProjects\Generics\obj\Debug\net8.0\ref\Generics.dll

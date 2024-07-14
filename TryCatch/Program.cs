@@ -27,8 +27,12 @@ namespace OutParameters
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error: {e.Message}");
-                };
+                    Console.WriteLine($"Error: {e.Message} - {e.StackTrace}");
+                }
+                finally
+                {
+                    Console.WriteLine("Finally!");
+                }
             }
             Console.WriteLine("Good bye");
         }
