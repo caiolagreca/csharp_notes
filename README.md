@@ -964,6 +964,65 @@ Faz com que classes personalizadas (que voce criou) possam utilizar o foreach. T
 
 <!-- OLHAR EXEMPLO NO FOLDER IENUMERABLE -->
 
+# Iterator:
+
+Um iterador é um método, propriedade ou bloco get que permite a iteração sobre uma coleção de maneira fácil, sem a necessidade de criar explicitamente uma classe enumeradora. O compilador gera essa classe enumeradora automaticamente para você.
+O iterador usa a palavra-chave yield para produzir uma sequência de valores, um de cada vez, conforme necessário pela iteração.
+
+- Vantagens:
+  Eficiência de Memória: Gera elementos sob demanda, o que pode ser mais eficiente em termos de memória.
+  Menos Código: Reduz a quantidade de código boilerplate necessário para criar um enumerador.
+  Simplicidade: O código é mais fácil de ler e manter.
+
+- Existem duas formas principais de usar yield:
+  yield return: Retorna cada elemento da coleção um por um.
+  yield break: Encerra a iteração.
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+public class MinhaColecao
+{
+    private string[] itens = { "Item1", "Item2", "Item3" };
+
+    public IEnumerator<string> GetEnumerator()
+    {
+        foreach (var item in itens)
+        {
+            yield return item;
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        MinhaColecao colecao = new MinhaColecao();
+
+        foreach (var item in colecao)
+        {
+            Console.WriteLine(item);
+        }
+    }
+}
+```
+
+# Singleton Pattern:
+
+Eh um padrão de design que garante uma única instância de uma classe com um ponto global de acesso.
+Vantagens: Controle de instâncias, ponto de acesso global, economia de recursos.
+Desvantagens: Dificuldade em testes, violação de SRP, estado global, dificuldade de extensão, problemas de concorrência (multi-thread) e desempenho.
+Alternativas: Injeção de dependência e gerenciamento de escopo de vida.
+
+- Estado global:
+  Refere-se a dados ou variáveis que podem ser acessados e modificados por qualquer parte do código da aplicação. No contexto de um Singleton, isso significa que a instância única mantém estado (dados) que é acessível de qualquer lugar, potencialmente levando a problemas de concorrência e dificuldade de rastreamento de mudanças.
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
+
+- Thread-Safe: Capacidade de um método ou classe de ser usado simultaneamente por múltiplas threads sem causar corrupção de dados ou resultados imprevisíveis.
+  Classe Random: Não é thread-safe, o que significa que o uso simultâneo por múltiplas threads pode levar a problemas de concorrência.
+  Soluções: Usar bloqueios (lock) ou ThreadLocal<Random> para garantir segurança em contextos multi-thread.

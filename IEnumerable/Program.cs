@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 
+
+/* OLHAR EXEMPLO NO README USANDO ITERATOR YIELD (MUITO MAIS SIMPLIFCADO) */
+
 namespace IEnumerables
 {
 
