@@ -1019,6 +1019,24 @@ Alternativas: Injeção de dependência e gerenciamento de escopo de vida.
 - Estado global:
   Refere-se a dados ou variáveis que podem ser acessados e modificados por qualquer parte do código da aplicação. No contexto de um Singleton, isso significa que a instância única mantém estado (dados) que é acessível de qualquer lugar, potencialmente levando a problemas de concorrência e dificuldade de rastreamento de mudanças.
 
+# Extensions Methods:
+
+São métodos estáticos que permitem adicionar novos métodos a tipos existentes sem modificar o código original do tipo ou criar uma subclasse.
+Proposito: adicionar funcionalidade adicional a metodos existentes sem modificar ou herdar o tipo.
+Não modificam o tipo original; adicionam novos métodos de forma não intrusiva.
+São definidos em classes estáticas e devem tambem ser estaticos e o primeiro parâmetro do método de extensão especifica o tipo que está sendo estendido, precedido pela palavra-chave this.
+No exemplo abaixo TargetType é o tipo que você está estendendo e target eh o Metodo que esta sendo estendido.
+
+```csharp
+public static class Extensions
+{
+    public static ReturnType ExtensionMethodExample(this TargetType target)
+    {
+        // Implementação do método
+    }
+}
+```
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
