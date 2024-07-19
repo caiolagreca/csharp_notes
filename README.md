@@ -1037,6 +1037,47 @@ public static class Extensions
 }
 ```
 
+# Dependency Injections:
+
+Permite que você injete as dependências de uma classe em vez de a própria classe criar essas dependências.
+
+É integrada e configurada através do contêiner de serviços:
+Um serviço é uma classe que oferece uma funcionalidade específica e bem definida, que pode ser usada por outras partes da aplicação.
+Contêiner de Serviços, também conhecido como IoC (Inversion of Control) Container, é um componente que gerencia a criação, vida útil e resolução de dependências de serviços. Ele permite que você registre os serviços e suas dependências e depois injete esses serviços onde necessário.
+
+É um padrão fundamental em ASP.NET Core que facilita o desenvolvimento de software modular, testável e de fácil manutenção. Ela desacopla as classes, promove a reutilização de código e centraliza a configuração dos serviços, tornando a aplicação mais flexível e robusta.
+
+Tipos de DI:
+Injeção de Construtor: Dependências são passadas através do construtor da classe.
+Injeção de Propriedade: Dependências são configuradas através de propriedades públicas.
+Injeção de Método: Dependências são passadas diretamente para métodos específicos.
+
+Existem três tipos principais de ciclos de vida das dependências:
+
+1. Transient:
+   Uma nova instância do serviço é criada cada vez que ele é solicitado.
+   Uso: Serviços leves e sem estado, que não mantêm dados entre solicitações.
+
+```csharp
+builder.Services.AddTransient<IService, ServiceImplementation>();
+```
+
+2. Scoped:
+   Uma única instância do serviço é criada por escopo de solicitação. Ou seja, a mesma instância é usada em toda a duração de uma única solicitação HTTP.
+   Uso: Serviços que mantêm estado durante a duração de uma solicitação HTTP.
+
+```csharp
+builder.Services.AddScoped<IService, ServiceImplementation>();
+```
+
+3. Singleton:
+   Uma única instância do serviço é criada e compartilhada por toda a aplicação.
+   Uso: Serviços pesados ou com estado que precisam ser compartilhados por toda a aplicação.
+
+```csharp
+builder.Services.AddSingleton<IService, ServiceImplementation>();
+```
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
