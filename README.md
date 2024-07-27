@@ -625,10 +625,19 @@ Console.WriteLine(person2.FirstName); // Saída: Jane
 Um DTO (Data Transfer Object) é um padrão de design usado para transferir dados entre camadas de um aplicativo, especialmente em arquiteturas de software onde é necessário passar dados entre o cliente e o servidor, ou entre diferentes partes de um sistema. O principal objetivo de um DTO é transportar dados sem comportamento, ou seja, sem lógica de negócios.
 
 Características dos DTOs
-Simples e Sem Comportamento: DTOs contêm apenas propriedades e não possuem métodos ou lógica de negócios.
+Simples e Sem Comportamento: DTOs contêm apenas propriedades e não possuem métodos ou lógica de negócios. (devem usar properties e nao fields).
 Usados para Transferência de Dados: São usados principalmente para transportar dados entre camadas ou sistemas.
 Desacoplamento: Ajudam a desacoplar as camadas do sistema, especialmente em aplicações distribuídas, como aquelas que usam APIs RESTful.
 Serialização e Desserialização: Facilitam a serialização e desserialização de dados, o que é útil para comunicação entre sistemas diferentes, como entre um cliente e um servidor via JSON ou XML.
+Podem ocultar propriedades que clientes nao devem visualizar.
+Imutabilidade nao eh um requisito para DTOs.
+Nao deve realizar encapsulamento e nao precisam de membros private/protected.
+
+Devem ser modelados como DTOs:
+API Request / Response Objects
+MVC ViewModel objects
+Database query result objects
+Messages (Commands, Events, Queries)
 
 Exemplo:
 
@@ -1077,6 +1086,353 @@ builder.Services.AddScoped<IService, ServiceImplementation>();
 ```csharp
 builder.Services.AddSingleton<IService, ServiceImplementation>();
 ```
+
+# Como JWT Tokens funcionam:
+
+1. O cliente solicita acesso a aplicacao usando suas credenciais (geralmente username e password).
+2. O servidor verifica se as credenciais do cliente sao válidas; caso seja, o servidor envia ao cliente um Token que serve para permitir acesso a endpoints que so podem ser acessados com a devida autenticacao e autorizacao.
+3. Agora, o cliente ja acessou a aplicacao com suas credenciais e obteve o Token atraves do servidor. Assim, o cliente irá acessar o endpoint que deseja (seja pelo metodo GET, POST, PUT, DELETE...)
+4. Porém, algum desses endpoints são restritos. Exemplo: so pode ser acessado após efetuar o login, ou mesmo após login só pode ser acessado por usuarios com privilegios (como deletar contas de usuarios que somente admin users podem realizar).
+5. Entao, para ter acesso e obter a resposta desses endpoints restritos, o cliente realiza uma requisicao HTTP/HTTPS do endpoint desejado e juntamente envia o Token obtido atraves do cabeçalho na requisicao.
+6. O servidor verifica se o Token eh valido e se ainda nao foi expirado, e caso seja, retorna a resposta da requisicao para o cliente, finalizando com sucesso a requisicao solicitada pelo cliente.
+
+# O que sao Claims:
+
+Uma claim (ou "declaração") é uma afirmação sobre um usuário que pode ser usada para autenticação e autorização. As claims são pares chave-valor que descrevem atributos específicos de um usuário, como nome, email, role, e outras propriedades. Elas são usadas em sistemas de autenticação para fornecer informações sobre o usuário e determinar seus direitos de acesso.
+Elas são incluídas em tokens de autenticação (como JWT) e são verificadas pelo servidor para determinar se um usuário tem permissão para acessar determinados recursos.
+
+Componentes de uma Claim:
+Type (Tipo): Define o tipo de informação que a claim representa (por exemplo, "name", "email", "role").
+Value (Valor): O valor associado ao tipo de claim (por exemplo, "player1", "player1@example.com", "admin").
+
+Tipos Comuns de Claims:
+Name: O nome do usuário.
+Role: A função ou papel do usuário (por exemplo, "admin", "user").
+Email: O endereço de email do usuário.
+Subscription: O nível de assinatura do usuário (por exemplo, "silver", "gold").
+
+Exemplo Prático
+Login e Geração de Token:
+O usuário faz login e, se autenticado, o servidor gera um token JWT que inclui claims sobre o usuário.
+Requisição Autenticada:
+O cliente envia o token JWT em cada requisição. O servidor valida o token e usa as claims contidas nele para determinar se o usuário tem permissão para acessar o recurso solicitado.
+
+ClaimsIdentity: é uma coleção de Claims .
+Por exemplo, pegue sua carteira de motorista. Ela tem claims como FirstName, LastName, DateOfBirth. Portanto, a carteira de motorista é ClaimsIdentity.
+
+ClaimsPrincipal: contém uma coleção de ClaimsIdentity . Você pode pensar no ClaimsPrincipal como o usuário do seu aplicativo.
+Um Usuário pode ter mais de uma ClaimsIdentity. Por exemplo, carteira de motorista e passaporte.
+Uma carteira de motorista é uma ClaimsIdentity com afirmações como FirstName, LastName, DateOfBirth, etc. Passaporte é outra ClaimsIdentity com afirmações como FirstName, LastName, Address, PassportNo, etc.
+
+# O que é Razor Pages:
+
+Razor Pages é um recurso do ASP.NET Core projetado para simplificar a construção de aplicações web. Cada página Razor é autossuficiente, combinando a lógica de UI e a apresentação em uma estrutura organizada. As principais vantagens incluem simplicidade, melhor organização do código e desempenho aprimorado em cenários simples. É ideal para aplicações simples a moderadas, prototipagem rápida e CRUDs. Contudo, pode ser menos adequado para aplicações altamente complexas devido à sua estrutura mais direta e menos flexível em comparação com MVC.
+
+Exemplo de Estrutura de Razor Page:
+Arquivo .cshtml: Contém o HTML e a lógica de apresentação.
+
+```csharp
+@page
+@model IndexModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index Page</title>
+</head>
+<body>
+    <h1>Hello, @Model.Message!</h1>
+</body>
+</html>
+```
+
+Arquivo PageModel: Contém a lógica de manipulação de dados e interações.
+
+```csharp
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+public class IndexModel : PageModel
+{
+    public string Message { get; private set; }
+
+    public void OnGet()
+    {
+        Message = "Welcome to Razor Pages!";
+    }
+}
+```
+
+# O que é gRPC:
+
+gRPC é um framework de comunicação de alta performance e plataforma cruzada que permite chamadas de procedimento remoto (Remote Procedure Call - RPC). Ele usa o protocolo HTTP/2 para transporte, Protocol Buffers como linguagem de descrição de interface (IDL) e pode ser utilizado em diversas linguagens de programação.
+
+Vantagens
+Desempenho: Utiliza HTTP/2, que oferece multiplexação de streams e compressão de cabeçalhos, resultando em comunicação eficiente e rápida.
+Plataforma Cruzada: Suporta diversas linguagens de programação e pode ser utilizado em múltiplos ambientes.
+Contract-First: Usa Protocol Buffers para definir contratos de serviço, garantindo a consistência entre cliente e servidor.
+Comunicação Bidirecional: Suporta streaming bidirecional, permitindo comunicação eficiente e em tempo real.
+
+Desvantagens
+Complexidade: Mais complexo de configurar e gerenciar em comparação a REST APIs simples.
+Ferramentas de Debugging: Menos ferramentas de debugging e monitoramento disponíveis comparadas a REST APIs.
+Compatibilidade: Requer suporte a HTTP/2, o que pode ser um problema em ambientes mais antigos.
+
+Quando Usar
+Comunicação de Alta Performance: Ideal para aplicações que exigem baixa latência e alta taxa de transferência.
+Microserviços: Adequado para comunicação eficiente entre microserviços.
+Streaming de Dados: Perfeito para casos de uso que requerem streaming de dados bidirecional.
+
+# O Que é Kestrel em ASP.NET Core:
+
+Kestrel é um servidor web leve e de alta performance incorporado ao ASP.NET Core. Ele é utilizado para hospedar aplicações ASP.NET Core e serve como o servidor web padrão na maioria das configurações de desenvolvimento e produção.
+
+1. Características Principais
+   Desempenho Elevado: Projetado para ser rápido e eficiente, utilizando recursos mínimos do sistema.
+   Compatibilidade com HTTP/1.1, HTTP/2 e HTTPS: Suporta os protocolos HTTP/1.1 e HTTP/2, além de conexões seguras via HTTPS.
+   Cross-Platform: Funciona em Windows, macOS e Linux, oferecendo flexibilidade de implantação.
+   Integração com Reverse Proxies: Pode ser usado em conjunto com servidores reverse proxy como IIS, Nginx ou Apache para aumentar a segurança, escalabilidade e estabilidade.
+
+2. Quando Usar
+   Desenvolvimento: Kestrel é ideal para o desenvolvimento local devido à sua simplicidade e facilidade de configuração.
+   Produção: Pode ser usado diretamente em produção ou atrás de um reverse proxy para fornecer funcionalidades adicionais de segurança e balanceamento de carga.
+
+3. Usando servidor Kestrel por tras de outro servidor web:
+   Kestrel nao é um servidor web com todos os recursos. Mas é isso que o torna rápido.
+   Não é aconselhável executar o Kestrel como um servidor web autônomo no ambiente de produção. É recomendável executá-lo por trás de um servidor Web com todos os recursos, como IIS, Nginx, Apache, etc. Em tal cenário, o servidor Web atua como um servidor proxy reverso.
+   O servidor proxy reverso recebe a solicitação HTTP da Internet e a passa para o servidor Kestrel exatamente como foi recebido.
+   O IIS pode receber a solicitação HTTP e executar processamento útil como registro, filtragem, e Reescritas de URL antes de passar a solicitação para o Kestrel.
+   Existem muitas razões pelas quais você deve usar este modelo na produção:
+   Segurança - Ele pode limitar sua área de superfície exposta. Ele fornece uma camada adicional opcional de configuração e defesa.
+   Simplifica o balanceamento de carga.
+   Configuração SSL - Somente seu servidor proxy reverso requer um certificado SSL, e esse servidor pode se comunicar com seus servidores de aplicativos na rede interna usando HTTP simples.
+   Compartilhando um único IP com vários endereços.
+   Solicitar filtragem, registro e reescrita de URL, etc.
+   Ele pode garantir que o aplicativo reinicie se ele travar.
+
+O metodo WebApplication.CreateBuilder registra e configura o servidor HTTP Kestrel. E quando executamos o comando app.Run ele começa a escutar requisições HTTP.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/", () => "Hello World!");
+
+app.Run();
+```
+
+# O Que é um Reverse Proxy:
+
+Um reverse proxy é um servidor que fica entre os clientes e os servidores de backend, encaminhando as solicitações dos clientes para os servidores apropriados e retornando as respostas para os clientes. Ele não é exatamente um balanceador de carga, mas pode desempenhar essa função junto com outras funcionalidades.
+
+Funcionalidades do Reverse Proxy
+Balanceamento de Carga: Distribui as solicitações de entrada entre vários servidores para otimizar o desempenho e evitar sobrecarga em um único servidor.
+Segurança: Adiciona uma camada de segurança ao ocultar os detalhes dos servidores backend e podendo aplicar políticas de segurança.
+Cache: Armazena em cache as respostas dos servidores backend para acelerar as respostas a solicitações subsequentes.
+SSL Termination: Descriptografa solicitações SSL/TLS, aliviando a carga dos servidores backend.
+Autenticação e Autorização: Pode ser configurado para autenticar e autorizar solicitações antes de encaminhá-las aos servidores backend.
+
+Exemplos de Reverse Proxy
+Nginx: Muito utilizado por sua performance e flexibilidade.
+Apache: Pode ser configurado como reverse proxy com módulos apropriados.
+IIS: No ambiente Windows, pode atuar como reverse proxy.
+HAProxy: Especializado em balanceamento de carga, também pode atuar como reverse proxy.
+
+# CLI:
+
+Dotnet cli é uma ferramenta de linha de comando. Ele contém comandos que você pode usar para:
+Criar um novo projeto
+Construir um projeto
+Executar o projeto
+Publicar o projeto
+Restaurar pacotes Nuget
+Migrar de uma versão para outra do .NET
+
+A sintaxe do NET CLI consiste em três partes. O “driver”, o “verbo” e os “argumentos”
+dotnet [verbo] [argumentos]
+O driver é “dotnet”. Ele pode executar um comando ou executar um aplicativo.
+O “verbo” é o comando que você quer executar. Ele realiza uma ação.
+Os “argumentos” são argumentos que passamos para os comandos invocados.
+
+Aqui estão alguns dos comandos dotnet CLI mais comuns:
+new - Cria um novo projeto, arquivo de configuração ou solução com base no modelo especificado.
+restore - Restaura as dependências e ferramentas de um projeto.
+build - Cria um projeto e todas as suas dependências.
+publish - Empacota o aplicativo e suas dependências em uma pasta para implantação em um sistema de hospedagem.
+run Executa código-fonte sem nenhum comando explícito de compilação ou inicialização.
+test - Driver de teste .NET usado para executar testes unitários.
+vstest - Executa testes dos arquivos especificados.
+pack - Empacota o código em um pacote NuGet.
+migrate - Migra um projeto .NET Core do Preview 2 para um projeto .NET Core SDK 1.0.
+clean - Limpa a saída de um projeto.
+sln - Modifica um arquivo de solução do .NET Core.
+help - Mostra documentação mais detalhada on-line para o comando especificado.
+store - Armazena os assemblies especificados no armazenamento de pacotes de tempo de execução.
+
+Lista de Templates para criacao de projeto:
+console - Console Application
+classlib - Class library
+mstest - Unit Test Project
+xunit - xUnit Test Project
+web - ASP.NET Core Empty
+mvc - ASP.NET Core Web App (Model-View-Controller)
+razor - ASP.NET Core Web App
+angular - ASP.NET Core with Angular
+react - ASP.NET Core with React.js
+reactredux - ASP.NET Core with React.js and Redux
+webapi - ASP.NET Core Web API
+
+# Arquivo lauchnSettings.json
+
+Este arquivo json contém todas as configurações específicas do projeto necessárias para iniciar o aplicativo. Você encontrará o perfil de depuração, as variáveis ​​de ambiente que devem ser usadas, etc.
+Ele é usado somente durante o desenvolvimento do aplicativo.
+Ele contém somente as configurações necessárias para executar o aplicativo.
+Este arquivo é ignorado quando publicamos o aplicativo.
+Você encontrará o launchSettings.json na pasta properties.
+
+2. O arquivo tem duas seções. Uma é iisSettings e a outra é a seção profiles.
+   iisSettings: contém as configurações necessárias para depurar o aplicativo no IIS (Internet Information Service) ou IIS Express.
+   profiles: A seção contém os perfis de depuração. O Visual Studio cria esses perfis quando cria o projeto.
+
+Exemplo:
+
+```csharp
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:38034",
+      "sslPort": 44314
+    }
+  },
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5117",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7120;http://localhost:5117",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
+```
+
+# Dependencies Folder
+
+Esta pasta contém todas as dependências do projeto.
+O Visual Studio usa NuGet para todas as dependências do lado do servidor.
+Para as dependências do lado do cliente, o Libman é usado. Este é um desvio das versões anteriores onde NuGet é usado para dependências do lado do servidor e do lado do cliente.
+
+1. Na pasta Dependências, temos as pastas Packages , Frameworks e Analyzers.
+
+   - A pasta Packages conterá os pacotes do lado do servidor que você instalar. Esta pasta é criada somente quando você instala um novo pacote.
+
+   - A pasta Frameworks contém o framework. Ela mostra dois pacotes Microsoft.AspNetCore.App e Microsoft.NetCore.App.
+     O Microsoft.NETCore.app é o coração do .NET. Ela contém os recursos comuns necessários para construir um aplicativo .NET (Windows, web, blazer etc).
+     O Microsoft.AspNetCore.app contém os recursos relacionados apenas ao ASP.NET Core.
+
+   - A pasta Analyzers inclui pacotes que ajudam o Visual Studio a analisar o código. Por exemplo, mensagens de erro e avisos que aparecem enquanto você digita, junto com correções automáticas de código, etc.
+
+O arquivo libman.json é criado quando instalamos os pacotes de terceiros usando o libman.
+
+# program.cs file
+
+A classe Program contém o ponto de entrada dos aplicativos ASP.NET Core.
+Não há método main neste arquivo, ele é implícito.
+Todas as tarefas que foram feitas na classe startup, agora são movidas para cá a partir da versão .NET 6.0.
+Ela contém o código de inicialização do aplicativo.
+Configura e registra os serviços necessários para o aplicativo.
+Registra componentes de middleware e configura o pipeline de tratamento de solicitações do aplicativo.
+
+1. ASP.NET Core apps configuram e iniciam um arquivo host:
+   Você pode pensar em um host como um wrapper em torno do seu aplicativo. Ele é responsável pela inicialização e gerenciamento do tempo de vida do aplicativo. O host contém a configuração do aplicativo e o servidor Kestrel (servidor HTTP) que escuta solicitações e envia respostas. Ele também configura o registro, injeção de dependência, configuração, pipeline de processamento de solicitação, etc.
+   Há três hosts diferentes capazes de executar um ASP.NET Core app:
+   WebHost - foi usado nas versões iniciais do ASP.NET Core
+   Generic Host - substituiu o WebHost no ASP.NET Core 3.0
+   WebApplication (or Minimal Host) - foi introduzido no ASP.NET Core 6.0
+
+2. O WebApplication é o núcleo do seu aplicativo ASP.NET Core. Ele contém a configuração do aplicativo e o servidor HTTP (Kestrel) que escuta solicitações e envia respostas.
+   O WebApplication se comporta de forma semelhante ao Generic Host, expondo muitas das mesmas interfaces, mas exigindo menos retornos de chamada de configuração.
+   Precisamos configurar o WebApplication antes de executá-lo. Há duas tarefas essenciais que precisamos executar antes de executar o aplicativo:
+   Configurar e adicionar os serviços para injeção de dependência .
+   Configurar o pipeline de solicitações , que manipula todas as solicitações feitas ao aplicativo.
+
+Essas quatro linhas contêm todo o código de inicialização necessário para criar um servidor web e começar a escutar solicitações:
+O program.cs file cria a aplicacao web em 3 estagios - Create, Build and Run.
+As versões anteriores do ASP.NET Core criavam dois arquivos. Um é program.cs, e o outro é startup.cs (conhecido como classe startup). O program.cs é onde configuramos o host, e a classe startup é onde usamos para configurar o aplicativo. Desde o ASP.NET core 6, ambos os processos são simplificados e mesclados em um program.cs.
+
+```csharp
+/* CREATE (cria uma instancia do WebApplication).
+CreateBuilder eh um metodo estatico da classe WebApplcation e retorna uma nova isntancia da classe WebApplicationBuilder.
+Ele configura alguns recursos básicos da plataforma ASP.NET por padrão, incluindo: Configuracao do servidor HTTP (Kestrel), Logging, Configuracao, adiciona servicos ao Contêiner de injeção de dependência, Adiciona os framework-provided services. */
+var builder = WebApplication.CreateBuilder(args);
+
+/* BUILD
+O método Build da classe WebApplicationBuilder cria uma nova instância da classe WebApplication .
+Usamos a instância do WebApplication para configurar os middlewares e endpoints. */
+var app = builder.Build();
+app.MapGet("/", () => "Hello World!"); //Insere Middlewares e endpoints aqui
+
+/* RUN
+O método Run da instância WebApplication inicia o aplicativo e escuta solicitações HTTP. */
+app.Run();
+
+```
+
+# appsettings.json
+
+é uma das várias maneiras pelas quais podemos fornecer os valores de configuração para o aplicativo ASP.NET core.
+Você encontrará esse arquivo na pasta raiz do nosso projeto.
+Também podemos criar arquivos específicos do ambiente como appsettings.development.json, appsettngs.production.json, etc.
+O sistema de configuração do ASP.NET Core carrega o appsettings.json e também o arquivo específico do ambiente appsettings com base no ambiente atual.
+O appsettings armazena os valores de configuração em pares nome-valor usando o formato JSON.
+
+Exemplo:
+
+```csharp
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}
+```
+
+O núcleo do ASP.NET lê o valor da variável ASPNETCORE_ENVIRONMENT contida no launchSettings.json, para determinar o ambiente atual.
+O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT bem no início do aplicativo. Ele então cria o IWebHostEnvironment object, que podemos usar para ler o ambiente atual em qualquer lugar do aplicativo.
+
+1. O núcleo do ASP.NET usa o provedor de configuração JSON para ler as configurações. Ele as lê na seguinte ordem:
+   appsettings.json
+   appsettings.<EnvironmentName>.json :
+   Por exemplo, se o ambiente atual for Desenvolvimento, então o appsettings.development.json é carregado. Se o ambiente for Produção, então ele usa oappsettings.production.json
+   Portanto, podemos carregar diferentes configurações com base no ambiente ou aplicativo em execução.
 
 # Extra Notes:
 
