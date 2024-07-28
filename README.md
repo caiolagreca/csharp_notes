@@ -1470,9 +1470,106 @@ Os StaticFile são aqueles arquivos cujo conteúdo não muda dinamicamente quand
 Para fornecer um arquivo estático, precisamos adicionar o Middleware de Arquivos Estáticos. Este Middleware está disponível no assembly Microsoft.AspNetCore.StaticFiles. Não precisamos instalar este conjunto, pois ele faz parte do Microsoft.AspNetCore.All Metapackage.
 Podemos configurar o ASP.NET Core para servir arquivo estático usando o método UseStaticFiles.
 
+Os arquivos estáticos são um Terminating Middleware. Se o File for encontrado, ele retornará o arquivo e encerrará o request pipeline.
+Ele chamará o próximo middleware, somente se não conseguir encontrar o recurso solicitado.
+
 1. wwwroot:
    é o diretório dentro da raiz de conteúdo de onde os recursos estáticos, como CSS, JavaScript e arquivos de imagem, são armazenados.
-   
+
+2. Seguranca:
+   O middleware de arquivo estático não verifica se o usuário está autorizado a visualizar o arquivo.
+   Se você deseja que apenas o usuário autorizado acesse o arquivo, você deve armazená-lo fora da pasta wwwroot. Você pode então fornecer o arquivo usando controller action e retornando um FileResult.
+
+# Value Type x Reference Type:
+
+1. Tipos de valor:
+   Definição: Armazenam dados diretamente.
+   Armazenamento: A variável contém a própria cópia dos dados.
+   Local de Armazenamento: Normalmente na stack.
+   Cópia: Ao atribuir a outra variável, cria uma cópia dos dados.
+   Exemplos: int, float, double, char, struct.
+
+2. Tipos de Referência:
+   Definição: Armazenam uma referência (endereço) para os dados.
+   Armazenamento: A variável contém um ponteiro para os dados que estão na heap.
+   Local de Armazenamento: Normalmente na heap (os dados) e a referência na stack.
+   Cópia: Ao atribuir a outra variável, copia a referência, não os dados.
+   Exemplos: object, string, array, class.
+
+A principal diferença é como os dados são armazenados e copiados. Tipos de valor armazenam diretamente os dados e copiam os dados ao serem atribuídos a outra variável, enquanto tipos de referência armazenam uma referência para os dados e copiam a referência ao serem atribuídos a outra variável.
+
+# Stack x Heap:
+
+1. Stack
+   Armazenamento: Utilizado para armazenar variáveis locais e chamadas de funções/métodos.
+   Acesso: Segue a estrutura LIFO (Last In, First Out).
+   Velocidade: Acesso rápido devido à sua natureza linear e previsível.
+   Gerenciamento: Gerenciado automaticamente pelo compilador, liberando memória ao final do escopo da função.
+   Tamanho: Geralmente limitado e menor em comparação à heap.
+
+2. Heap
+   Armazenamento: Utilizado para armazenar objetos e dados que precisam de alocação dinâmica.
+   Acesso: Acesso indireto por meio de referências/pointers.
+   Velocidade: Acesso mais lento devido à alocação/desalocação dinâmica e fragmentação de memória.
+   Gerenciamento: Gerenciado pelo coletor de lixo (garbage collector), que desaloca memória quando não é mais referenciada.
+   Tamanho: Geralmente maior e mais flexível que a stack.
+
+3. Conclusao
+   Stack: Ideal para dados de curta duração e alocação rápida, com acesso direto e previsível.
+   Heap: Adequado para dados que precisam de maior tempo de vida e alocação dinâmica, com gerenciamento de memória mais complexo e flexível.
+
+4. Alocacao Dinamica:
+   Refere-se à prática de alocar memória durante a execução do programa, ao invés de durante a compilação. Isso permite que um programa utilize memória de forma mais flexível, adaptando-se às necessidades em tempo de execução.
+   A memória é alocada na heap, e a alocação é gerenciada pelo programador ou pelo sistema de gerenciamento de memória (como o garbage collector).
+
+# MVC Architecture:
+
+é um padrão de camada de Apresentação. Ele lida apenas com como e quando os dados são apresentados ao Usuário. Você precisa usar esse padrão junto com a camada de acesso a dados e a camada de negócios para criar um aplicativo da web Completo.
+
+1. Model:
+   O modelo representa os dados que precisam ser mostrados ao usuário e alguma lógica associada.
+   O Model não depende e não deve depender do Controller ou View.
+   A única responsabilidade do Model é manter os dados.
+   A classe do Model é reutilizável.
+
+2. View:
+   A view é uma representação visual do Model.
+   É responsabilidade da View pegar o Model do Controller, renderizá-lo e apresentá-lo ao usuário.
+   A view é conectada a um Model, acessa seus dados e os mostra ao usuário. Ela pode atualizar o Model e enviá-lo de volta ao Controller para atualização do banco de dados.
+   A view nunca acessará a camada de negócios ou a camada de dados.
+
+   - A View tem as seguintes responsabilidades:
+     Responsável por interagir com o Usuário
+     Renderizar o Model para o usuário
+     Aceita a interação do usuário e passa ao Controller
+     Consiste em páginas HTML padrão / Javascript e CSS
+     Deve ser capaz de renderizar JSON, XML e tipos de retorno personalizados
+
+3. Controller:
+   O Controller recebe a solicitação. Ele então constrói o Model e seleciona a View para exibi-lo. Ele fica entre a View e o Model. Você pode pensar nele como uma cola que une o Model à View.
+   Ele controla o fluxo de atividade.
+   O Controller não deve se tornar um depósito para seu código. Ele deve sempre delegar o trabalho para a camada de serviço (por exemplo, a camada de dados para obter os dados, a camada de negócios para executar a lógica de negócios, etc.) para construir e obter o Model. O Model então, deve ser injetado na View para renderizar a View.
+
+   - O Controller tem as seguintes responsabilidades:
+     Processa solicitações recebidas do usuário.
+     O Controller então passa a solicitação para a camada de serviço apropriada para obter o Model.
+     Passe o Model para View para renderização.
+     Passa as validações e erros de volta para a View, se houver.
+     O Controller nunca acessa a camada de dados.
+     O Controller atua tanto no Model quanto na View. Ele controla o fluxo de dados para o objeto do Model e atualiza a View sempre que os dados mudam. Ele mantém a View e o Model separados.
+
+4. Como funciona MVC no ASP .NET Core:
+   =(Request)=>[CONTROLLER]=(Builds)=>[MODEL]=(Renders)=>[VIEW]=(HTML)=>
+
+   A Request começa quando o usuário clica em um botão, em um link ou digita a URL no navegador.
+   A Request chega ao Middleware MVC após passar pelo Request Pipeline.
+   O MVC Middleware inspeciona a URL e decide qual Controller invocar. O processo de mapeamento da request para o Controller é chamado Routing.
+   O MVC Middleware invoca o Controller e passa a request do usuário.
+   O Controller agora olha para a request do usuário e decide o que fazer com ela. A request pode ser para inserir um novo cliente ou obter uma lista de clientes (exemplo). O Controller constrói o Model apropriado. Ele chamará a camada de serviço para concluir sua tarefa.
+   O Controller passa o Model para a View apropriada e passa o controle para a View para construir a resposta.
+   A View gerará a resposta apropriada. A resposta pode ser um HTML, XML, Json ou um arquivo para download. Em seguida, ela o envia de volta ao usuário.
+   O ciclo da request é concluído e o aplicativo aguarda nova interação do usuário, o que iniciará um novo ciclo.
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
