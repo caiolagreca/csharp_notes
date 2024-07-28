@@ -8,14 +8,14 @@ app.Use(async (context, next) =>
     await next.Invoke();
     await context.Response.WriteAsync("<div> Returning from the middleware 1 </div>");
 });
-
+//"Use" para todos os middlewares menos para o ultimo
 app.Use(async (context, next) =>
 {
     await context.Response.WriteAsync("<div> Hello World from the middleware 2 </div>");
     await next.Invoke();
     await context.Response.WriteAsync("<div> Returning from the middleware 2 </div>");
 });
-
+//"Run" para o ultimo middleware
 app.Run(async (context) =>
 {
     await context.Response.WriteAsync("<div> Hello World from the middleware 3 </div>");

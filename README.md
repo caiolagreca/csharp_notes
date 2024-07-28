@@ -78,7 +78,7 @@ public class Bird : IFlyable
 
 Deve ser inicializado antes de passar para o método.
 Use quando você precisa que um método leia e modifique o valor de um argumento passado.
-Jse quando o argumento deve ser inicializado antes de ser passado ao método.
+Use quando o argumento deve ser inicializado antes de ser passado ao método.
 
 ```csharp
 using System;
@@ -102,9 +102,9 @@ namespace RefExample
 }
 ```
 
-2. Use out:
+2. Out:
 
-Não precisa ser inicializado antes de passar para o método
+Não precisa ser inicializado antes de passar para o método.
 Use quando você quer que um método retorne múltiplos valores ou quando um método precisa retornar um valor através de um parâmetro que não precisa ser inicializado antes da chamada.
 Use quando o método deve garantir que o argumento tenha um valor atribuído antes de retornar.
 
@@ -1446,7 +1446,8 @@ O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT be
 # Request Pipeline e Middlewares:
 
 O Request Pipeline é o mecanismo pelo qual as requests são processadas começando com uma Request e terminando com uma Response.
-O pipeline especifica como o aplicativo deve responder ao HTTP request. A solicitação que chega do navegador passa pelo pipeline e volta.
+O pipeline especifica como o aplicativo deve responder ao HTTP request.
+A solicitação que chega do navegador passa pelo pipeline e volta.
 Os componentes individuais que compõem o pipeline são chamados de Middleware.
 
 1. Middlewares:
@@ -1518,57 +1519,201 @@ A principal diferença é como os dados são armazenados e copiados. Tipos de va
    Stack: Ideal para dados de curta duração e alocação rápida, com acesso direto e previsível.
    Heap: Adequado para dados que precisam de maior tempo de vida e alocação dinâmica, com gerenciamento de memória mais complexo e flexível.
 
-4. Alocacao Dinamica:
+4. Alocacao dinâmica:
    Refere-se à prática de alocar memória durante a execução do programa, ao invés de durante a compilação. Isso permite que um programa utilize memória de forma mais flexível, adaptando-se às necessidades em tempo de execução.
    A memória é alocada na heap, e a alocação é gerenciada pelo programador ou pelo sistema de gerenciamento de memória (como o garbage collector).
 
 # MVC Architecture:
 
-é um padrão de camada de Apresentação. Ele lida apenas com como e quando os dados são apresentados ao Usuário. Você precisa usar esse padrão junto com a camada de acesso a dados e a camada de negócios para criar um aplicativo da web Completo.
+é um padrão de camada de Apresentação. Ele lida apenas com como e quando os dados são apresentados ao Usuário. Você precisa usar esse padrão junto com a camada de acesso a dados e a camada de negócios para criar um aplicativo web Completo.
 
-1. Model:
-   O modelo representa os dados que precisam ser mostrados ao usuário e alguma lógica associada.
-   O Model não depende e não deve depender do Controller ou View.
-   A única responsabilidade do Model é manter os dados.
-   A classe do Model é reutilizável.
+1.  Model:
+    O modelo representa os dados que precisam ser mostrados ao usuário e alguma lógica associada.
+    O Model não depende e não deve depender do Controller ou View.
+    A única responsabilidade do Model é manter os dados.
+    A classe do Model é reutilizável.
 
-2. View:
-   A view é uma representação visual do Model.
-   É responsabilidade da View pegar o Model do Controller, renderizá-lo e apresentá-lo ao usuário.
-   A view é conectada a um Model, acessa seus dados e os mostra ao usuário. Ela pode atualizar o Model e enviá-lo de volta ao Controller para atualização do banco de dados.
-   A view nunca acessará a camada de negócios ou a camada de dados.
+2.  View:
+    A view é uma representação visual do Model.
+    É responsabilidade da View pegar o Model do Controller, renderizá-lo e apresentá-lo ao usuário.
+    A view é conectada a um Model, acessa seus dados e os mostra ao usuário. Ela pode atualizar o Model e enviá-lo de volta ao Controller para atualização do banco de dados.
+    A view nunca acessará a camada de negócios ou a camada de dados.
 
-   - A View tem as seguintes responsabilidades:
-     Responsável por interagir com o Usuário
-     Renderizar o Model para o usuário
-     Aceita a interação do usuário e passa ao Controller
-     Consiste em páginas HTML padrão / Javascript e CSS
-     Deve ser capaz de renderizar JSON, XML e tipos de retorno personalizados
+    - A View tem as seguintes responsabilidades:
+      Responsável por interagir com o Usuário
+      Renderizar o Model para o usuário
+      Aceita a interação do usuário e passa ao Controller
+      Consiste em páginas HTML padrão / Javascript e CSS
+      Deve ser capaz de renderizar JSON, XML e tipos de retorno personalizados
 
-3. Controller:
-   O Controller recebe a solicitação. Ele então constrói o Model e seleciona a View para exibi-lo. Ele fica entre a View e o Model. Você pode pensar nele como uma cola que une o Model à View.
-   Ele controla o fluxo de atividade.
-   O Controller não deve se tornar um depósito para seu código. Ele deve sempre delegar o trabalho para a camada de serviço (por exemplo, a camada de dados para obter os dados, a camada de negócios para executar a lógica de negócios, etc.) para construir e obter o Model. O Model então, deve ser injetado na View para renderizar a View.
+3.  Controller:
+    O Controller recebe a solicitação. Ele então constrói o Model e seleciona a View para exibi-lo. Ele fica entre a View e o Model. Você pode pensar nele como uma cola que une o Model à View.
+    Ele controla o fluxo de atividade.
+    O Controller não deve se tornar um depósito para seu código. Ele deve sempre delegar o trabalho para a camada de serviço (por exemplo, a camada de dados para obter os dados, a camada de negócios para executar a lógica de negócios, etc.) para construir e obter o Model. O Model então, deve ser injetado na View para renderizar a View.
 
-   - O Controller tem as seguintes responsabilidades:
-     Processa solicitações recebidas do usuário.
-     O Controller então passa a solicitação para a camada de serviço apropriada para obter o Model.
-     Passe o Model para View para renderização.
-     Passa as validações e erros de volta para a View, se houver.
-     O Controller nunca acessa a camada de dados.
-     O Controller atua tanto no Model quanto na View. Ele controla o fluxo de dados para o objeto do Model e atualiza a View sempre que os dados mudam. Ele mantém a View e o Model separados.
+            - O Controller tem as seguintes responsabilidades:
+              Processa requests recebidas do usuário.
+              O Controller então passa a request para a camada de serviço apropriada para obter o Model.
+              Passa o Model para View para renderização.
+              Passa as validações e erros de volta para a View, se houver.
+              O Controller nunca acessa a camada de dados.
+              O Controller atua tanto no Model quanto na View. Ele controla o fluxo de dados para o objeto do Model e atualiza a View sempre que os dados mudam. Ele mantém a View e o Model separados.
 
-4. Como funciona MVC no ASP .NET Core:
-   =(Request)=>[CONTROLLER]=(Builds)=>[MODEL]=(Renders)=>[VIEW]=(HTML)=>
+            - A Class Controller deve satisfazer ao menos uma das condicoes:
+              O nome da classe é sufixado com “Controller”.
+              A classe herda de uma classe cujo nome é sufixado com “Controller”.
+              A classe é decorada com o atributo [Controller].
 
-   A Request começa quando o usuário clica em um botão, em um link ou digita a URL no navegador.
-   A Request chega ao Middleware MVC após passar pelo Request Pipeline.
-   O MVC Middleware inspeciona a URL e decide qual Controller invocar. O processo de mapeamento da request para o Controller é chamado Routing.
-   O MVC Middleware invoca o Controller e passa a request do usuário.
-   O Controller agora olha para a request do usuário e decide o que fazer com ela. A request pode ser para inserir um novo cliente ou obter uma lista de clientes (exemplo). O Controller constrói o Model apropriado. Ele chamará a camada de serviço para concluir sua tarefa.
-   O Controller passa o Model para a View apropriada e passa o controle para a View para construir a resposta.
-   A View gerará a resposta apropriada. A resposta pode ser um HTML, XML, Json ou um arquivo para download. Em seguida, ela o envia de volta ao usuário.
-   O ciclo da request é concluído e o aplicativo aguarda nova interação do usuário, o que iniciará um novo ciclo.
+            - Action Methods:
+              Qualquer método público exposto por um controlador é chamado de Action Method.
+              O método Action é chamado quando um usuário digita uma URL específica no navegador.
+              Os métodos de ação devem chamar a camada de serviço para responder à request. A camada de serviço geralmente deve consultar ou atualizar o banco de dados usando a camada de acesso a dados e, em seguida, mapear os resultados em um modelo e passá-lo de volta para o método de ação.
+              O método Action então invoca a View com o modelo para gerar a resposta.
+              A resposta pode ser uma página HTML, Json, XML ou um arquivo para baixar.
+
+              Qualquer método público em uma classe Controller pode ser invocado por qualquer pessoa localizada em qualquer lugar do mundo. Então, tenha cuidado ao colocar um método público no controlador.
+
+              Ao criar um Action Method, você deve se lembrar do seguinte:
+              Método de ação deve ser um método público.
+              O método Action não pode ser um método estático ou um método de extensão.
+              O Constructor, getter ou setter não podem ser usados.
+              Métodos herdados não podem ser usados ​​como método Action.
+              Métodos de ação Não podem conter parâmetros ref ou out.
+              Os métodos de ação não podem conter o atributo [NonAction].
+              Os métodos de ação não podem ser overloaded.
+
+              Geralmente, um action Controller deve retornar algo chamado Action Result. Cada tipo de retorno, como HTML, Json ou string, tem seu próprio Action Result, que herda da classe base ActionResult.
+              A classe base ActionResult é uma classe abstrata.
+
+              Por exemplo, para gerar resposta HTML, usamos ViewResult .
+              Para gerar resultado de string ou texto, usamos ContentResult.
+              Tanto ViewResult quanto ContentResult herdam de ActionResult.
+              O ASP.NET Core MVC possui suporte integrado para vários tipos de Action results:
+                ViewResult – Representa HTML e marcação.
+                EmptyResult – Não representa nenhum resultado.
+                RedirectResult – Representa um redirecionamento para uma nova URL.
+                JsonResult – Representa um resultado de Notação de Objeto JavaScript que pode ser usado em um aplicativo AJAX.
+                JavaScriptResult – Representa um script JavaScript.
+                ContentResult – Representa um resultado de texto.
+                FileContentResult – Representa um arquivo para download (com o conteúdo binário).
+                FilePathResult – Representa um arquivo para download (com um caminho).
+                FileStreamResult – Representa um arquivo para download (com um fluxo de arquivos).
+
+4.  Endpoint Routing:
+
+        - Possui 3 componentes:
+          Definindo os Endpoints.
+          Correspondência de rotas e construção de um ponto final ( UseRouting).
+          Execução de ponto final ( UseEndpoints). - Atualmente nao usamos mais UseEndpoints e ja chamamos direto o MapControllerRoute no Program.cs por exemplo.
+
+        - UseRouting:
+          Quando o app inicia, UseRouting registra o Route Matching Middleware "EndPointRoutingMiddleware".
+          O EndPointRoutingMiddleware resolve as requests HTTP recebidas e constrói um Endpoint e atualiza o context.
+          O Middleware em execução depois do UseRouting pode acessar o endpoint do HTTP Context e tomar medidas. Por exemplo, um middleware de autorização pode consultar os metadados do endpoint e aplicar a política de autorização correta com base nessas informações.
+          Middlewares executados antes da chamada do metodo UseRouting nao podem acessar os Endpoints.
+          Sua finalidade é:
+            Analisar a URL de entrada.
+            Resolver a URL e construir o Endpoint.
+            Atualizar o objeto HTTP Context com o Endpoint usando o método SetEndpoint.
+          Os objetos Endpoint são imutáveis ​​e não podem ser modificados após a criação.
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+// Adicionar serviços MVC ao contêiner
+builder.Services.AddControllersWithViews();
+var app = builder.Build();
+// Configurar o pipeline de solicitação HTTP
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.Run();
+```
+
+Eh necessario configurar o Endpoint para cada Action Method do Controller. Ha 2 maneiras para isso:
+
+- Convention-based routing:
+  é normalmente usado com os Controllers e Views. Ele cria rotas com base em uma série de convenções.
+
+  MapControllerRoute é um método de extensão no EndpointRouteBuilder e aceita os seguintes argumentos:
+  name: O nome da rota
+  pattern: O padrão de URL da rota
+  defaults: Um objeto que contém valores padrão para parâmetros de rota. As propriedades do objeto representam os nomes e valores dos default values.
+  constraints: Um objeto que contém restrições para a rota. As propriedades do objeto representam os nomes e valores das restrições.
+  dataTokens: Um objeto que contém tokens de dados para a rota. As propriedades do objeto representam os nomes e valores dos tokens de dados.
+
+  O MapControllerRoute cria uma única rota, que é nomeada como default e o Padrão de URL da rota é {controller=Home}/{action=Index}/{id?}
+  Cada rota deve conter um URL Pattern. Este Pattern é comparado a uma URL de entrada. Se o pattern corresponder à URL, então ele é usado pelo sistema de roteamento para processar essa URL.
+  Cada URL Pattern consiste em um ou mais Segments. A barra delimita um Segment de outro segmento.
+  Cada segmento pode ser um Constant(literal) ou Route Parameter.
+  O Route Parameters são colocados entre chaves {controller}, por exemplo {action}.
+  O Route Parameters pode ter valor padrão como {controller=Home}, onde Home é o valor padrão para o controlador. Um = sinal de igual seguido por um valor após o Route Parameter define um valor padrão para o parâmetro.
+  Você também pode ter os Constant. Ex: admin/{controller=Home}/{action=Index}/{id?}. Aqui admin eh um Constant e deve estar presente na URL solicitada.
+  O ? em {id ?} indica que é opcional. Um ponto de interrogação ? após o nome do parâmetro de rota define o parâmetro como opcional.
+
+```csharp
+app.MapControllerRoute(
+  name: "default",
+  pattern: "{controller=Home}/{action=Index}/{id?}");
+```
+
+Outra maneira eh usar default arguments:
+
+```csharp
+app.MapControllerRoute(
+  name: "default",
+  pattern: "{controller}/{action}",
+  defaults: new { controller=home, action = "Index" });
+```
+
+- Attribute routing:
+  usa os atributos definidos diretamente na ação do Controller para definir as rotas. O Attribute routing dá a você mais controle sobre as URLs em seu aplicativo web.
+  Para configurar um Routing baseado em atributo, use o método MapControllers.
+
+  ```csharp
+  endpoints.MapControllers();
+  ```
+
+MapControllerRoute e MapControllers escondem todas as complexidades de configuração do Endpoint de nós. Ambos configuram o Endpoint para os Controllers Action Methods.
+
+Você também pode criar um Endpoint para um delegate personalizado usando o metodo MapGet.
+MapGet aceita dois argumentos. Um é Route Pattern ( "/" no exemplo) e o outro um request delegate que será executado quando o Endpoint for correspondido.
+
+```csharp
+endpoints.MapGet("/", async context =>
+   {
+      await context.Response.WriteAsync("Hello World");
+   });
+```
+
+5.  Como funciona MVC no ASP .NET Core:
+    =(Request)=>[CONTROLLER]=(Builds)=>[MODEL]=(Renders)=>[VIEW]=(HTML)=>
+
+    A Request começa quando o usuário clica em um botão, em um link ou digita a URL no navegador.
+    A Request chega ao Middleware MVC após passar pelo Request Pipeline.
+    O MVC Middleware inspeciona a URL e decide qual Controller invocar. O processo de mapeamento da request para o Controller é chamado Routing.
+    O MVC Middleware invoca o Controller e passa a request do usuário.
+    O Controller agora olha para a request do usuário e decide o que fazer com ela. A request pode ser para inserir um novo cliente ou obter uma lista de clientes (exemplo). O Controller constrói o Model apropriado. Ele chamará a camada de serviço para concluir sua tarefa.
+    O Controller passa o Model para a View apropriada e passa o controle para a View para construir a resposta.
+    A View gerará a resposta apropriada. A resposta pode ser um HTML, XML, Json ou um arquivo para download. Em seguida, ela o envia de volta ao usuário.
+    O ciclo da request é concluído e o aplicativo aguarda nova interação do usuário, o que iniciará um novo ciclo.
 
 # Extra Notes:
 
