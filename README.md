@@ -1210,6 +1210,15 @@ Kestrel é um servidor web leve e de alta performance incorporado ao ASP.NET Cor
    Solicitar filtragem, registro e reescrita de URL, etc.
    Ele pode garantir que o aplicativo reinicie se ele travar.
 
+   4. Recursos Ausentes em Kestrel
+      Gerenciamento Avançado de Conexões: Kestrel não oferece funcionalidades avançadas de gerenciamento de conexões, como limitar o número de conexões simultâneas ou gerenciar filas de conexões de forma eficiente.
+      Segurança Avançada: Embora suporte SSL/TLS, Kestrel não tem recursos avançados de segurança, como filtragem de IP, proteção contra ataques DDoS, ou inspeção profunda de pacotes.
+      Balanceamento de Carga: Kestrel não inclui balanceamento de carga integrado. Em ambientes de produção, é comum usá-lo atrás de um balanceador de carga, como Nginx ou Azure Load Balancer.
+      Logging e Monitoramento Avançados: Ele não fornece ferramentas avançadas de logging e monitoramento que alguns servidores web completos oferecem.
+      Configuração Simplificada: Kestrel é altamente configurável, mas não oferece a mesma facilidade de configuração para aspectos complexos de um servidor web completo.
+
+      Devido a essas limitações, Kestrel é frequentemente usado em produção atrás de um reverse proxy ou balanceador de carga, como Nginx, Apache, ou IIS. Isso permite combinar a alta performance de Kestrel com os recursos avançados de um servidor web completo, garantindo uma solução robusta e escalável.
+
 O metodo WebApplication.CreateBuilder registra e configura o servidor HTTP Kestrel. E quando executamos o comando app.Run ele começa a escutar requisições HTTP.
 
 ```csharp
@@ -1434,6 +1443,36 @@ O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT be
    Por exemplo, se o ambiente atual for Desenvolvimento, então o appsettings.development.json é carregado. Se o ambiente for Produção, então ele usa oappsettings.production.json
    Portanto, podemos carregar diferentes configurações com base no ambiente ou aplicativo em execução.
 
+# Request Pipeline e Middlewares:
+
+O Request Pipeline é o mecanismo pelo qual as requests são processadas começando com uma Request e terminando com uma Response.
+O pipeline especifica como o aplicativo deve responder ao HTTP request. A solicitação que chega do navegador passa pelo pipeline e volta.
+Os componentes individuais que compõem o pipeline são chamados de Middleware.
+
+1. Middlewares:
+   é um componente de software que se conecta ao pipeline de requests para lidar com solicitações da web e gerar respostas.
+   Cada middleware processa e manipula a request conforme ela é recebida do middleware anterior.
+   Ele pode decidir chamar o próximo middleware no pipeline ou enviar a resposta de volta para o middleware anterior (encerrando o pipeline).
+
+2. Como funcionam os middlewares:
+   Primeiro, a solicitação HTTP chega (diretamente ou por meio de um servidor web externo) ao aplicativo.
+   O servidor Web Kestrel pega a solicitação e cria o httpContext e passa para o Primeiro Middleware no Request pipeline.
+   O Primeiro Middleware então assume, processa a solicitação e a passa para o próximo Middleware. Isso continua até chegar ao último middleware.
+   O último middleware retorna a solicitação ao middleware anterior, encerrando efetivamente o pipeline de solicitação.
+   Cada middleware na sequência tem uma segunda chance de inspecionar a solicitação e modificar a resposta no caminho de volta.
+   Finalmente, a resposta chega ao Kestrel, que retorna a resposta ao cliente.
+   Qualquer um dos middlewares no pipeline de request pode encerrar o pipeline simplesmente não passando a solicitação para o próximo middleware.
+   As solicitacoes sao passadas de um Middleware para outro atraves do metodo "next.Invoke()"
+
+# Static File:
+
+Os StaticFile são aqueles arquivos cujo conteúdo não muda dinamicamente quando o usuário os solicita. Portanto, não faz sentido que a solicitação passe por todo o caminho até o MVC Middleware, apenas para servir esses arquivos. O ASP.NET Core fornece um Middleware integrado apenas para essa tarefa.
+Para fornecer um arquivo estático, precisamos adicionar o Middleware de Arquivos Estáticos. Este Middleware está disponível no assembly Microsoft.AspNetCore.StaticFiles. Não precisamos instalar este conjunto, pois ele faz parte do Microsoft.AspNetCore.All Metapackage.
+Podemos configurar o ASP.NET Core para servir arquivo estático usando o método UseStaticFiles.
+
+1. wwwroot:
+   é o diretório dentro da raiz de conteúdo de onde os recursos estáticos, como CSS, JavaScript e arquivos de imagem, são armazenados.
+   
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
