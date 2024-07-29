@@ -1686,11 +1686,85 @@ app.MapControllerRoute(
 - Attribute routing:
   usa os atributos definidos diretamente na ação do Controller para definir as rotas. O Attribute routing dá a você mais controle sobre as URLs em seu aplicativo web.
   Para configurar um Routing baseado em atributo, use o método MapControllers.
+  O MapControllers() registra o Endpoint para todos os Route Attributes presentes no aplicativo.
+  As rotas sao configuradas usando o Route Attribute no Controller Action. o Route Attribute possui 3 argumentos (URL Pattern, Name e Order).
+
+  ```csharp
+  public class HomeController: Controller{
+  [Route("Home/Index")] //“Home/Index” as the URL Pattern.
+  public string Index(){
+  return "Hello from Index method of Home Controller";
+  }
+  }
+  ```
 
   ```csharp
   endpoints.MapControllers();
   ```
 
+  Voce tambem pode definir varias rotas para uma unica acao usando o Attribute Routing:
+
+  ```csharp
+  [Route("")]
+  [Route("Home")]
+  [Route("Home/Index")]
+  public string Index(){
+    return "Hello from Index method of Home Controller";
+  }
+  ```
+
+  Voce pode utilizar Token Replacement para facilitar, no qual o Attribute Routing nos fornece os Tokens para [area], [controller] e [action].
+  Esses tokens são substituídos por seus valores reais na Action Collection:
+
+  ```csharp
+  [Route("")]
+  [Route("[controller]")]
+  [Route("[controller]/[action]")]
+  public string Index(){
+    return "Hello with Token Replacement";
+  }
+  ```
+
+  Tambem podemos definir URL Parameter adicionais, sendo passado parametros para o Action Method:
+
+  ```csharp
+  [Route("")]
+  [Route("[controller]")]
+  [Route("[controller]/[action]/{id?}")]
+  public string Index (string id){
+    if (id != null){
+      return "Received" + id.ToString();
+    } else{
+      return "Received nothing";
+    }
+  }
+  ```
+
+  Tambem eh possivel definir o Route Attribute no Controller Class. Todo URL Pattern definido no Controller Class eh prefixado no URL Pattern no Action Method:
+
+  ```csharp
+  [Route("Home")]
+  public class HomeController : Controller {
+    [Route("Index")]
+    public string Index (){
+      return "Hello from Index Method";
+    }
+  }
+  ```
+
+  Attribute route tambem pode ser usado com atributos de verbo HTTP como HttpGet, HttpPost etc:
+
+  ```csharp
+  [HttpGet("")]
+  [HttpGet("Home")]
+  [HttpGet("Home/Index")]
+  public string Index(){
+    return "Hello from Index method";
+  }
+  ```
+
+No convetion-based routing, todo roteamento eh configurado no Program.cs, enquanto que atraves do Attribute routing, o roteamento eh configurado direto no Controller.
+Podemos usar os 2 tipos no mesmo projeto, porem se voce definir Attribute routing em uma Action, entao convetion-based routing nao pode ser usada nessa Action.
 MapControllerRoute e MapControllers escondem todas as complexidades de configuração do Endpoint de nós. Ambos configuram o Endpoint para os Controllers Action Methods.
 
 Você também pode criar um Endpoint para um delegate personalizado usando o metodo MapGet.
@@ -1702,6 +1776,292 @@ endpoints.MapGet("/", async context =>
       await context.Response.WriteAsync("Hello World");
    });
 ```
+
+- Restricao de Rotas:
+
+  Podemos adicionar restricao a um URL Pattern de 2 maneiras:
+
+  1.  Em linha com o parâmetro URL:
+      As restrições em linha são adicionadas ao parâmetro URL após os dois pontos ":"
+      Assim que o mecanismo de roteamento encontra uma correspondência para o URL de entrada, ele invoca o Route Constraint para cada segmento da URL para ver se ele passa na verificação. As restrições fazem uma decisão simples de sim/não sobre se o valor é aceitável ou não.
+
+            ```csharp
+            routes.MapRoute("default", "{controller=Home}/{action=Index}/{id:int?}");
+            // A restricao int checa o para ver se o valor do Id pode ser analisado para um valor inteiro. O segmento id é opcional. Portanto, a rota corresponderá se o Id não estiver presente, mas se o id estiver presente, então ele deve ser um valor inteiro.
+            ```
+
+            O mesmo se aplica em Atrribute Routing:
+
+            ```csharp
+            [Route("Home/Index/{id:int}")]
+            public string Index(int id)
+            {
+              return "I got " + id.ToString();
+            }
+            ```
+
+  2.  Usando o argumento Constrains para o metodo MapRoute:
+      Voce precisa importar o namespace Microsoft.AspNetCore.Routing.Constraints
+      ```csharp
+      using Microsoft.AspNetCore.Routing.Constraints;
+      app.UseMvc(routes =>
+      {
+        routes.MapRoute("default",
+          "{controller}/{action}/{id}",
+          new { controller = "Home", action = "Index" },
+          new { id = new IntRouteConstraint() });
+      });
+      //Criamos uma instância de Anonymous type, que contém propriedades, cujos nomes de propriedade são os mesmos que os Parâmetros de URL,  em que as restrições são aplicadas. Essas Propriedades são atribuídas à instância da classe Constraint.
+      ```
+
+  Existe uma serie de classes pre definidas que podem ser usadas para definir restricoes individuais. Para isso eh necessario inserir o namespace passado no exemplo acima.
+  As Route Constrains podem ser usadas para validacao de Input, porem esse nao eh seu principal objetivo. Seu intuito eh ajudar o mecanismo de roteamento a distinguir entre 2 rotas similares. Por exemplo:
+
+  ```csharp
+  app.UseMvc(routes =>
+   {
+     routes.MapRoute("default",
+       "post/{id:int}",
+       new { controller = "Post", action = "PostsByID" });
+
+     routes.MapRoute("anotherRoute",
+       "post/{id:alpha}",
+       new { controller = "Post", action = "PostsByPostName" });
+
+   });
+  ```
+
+  Podemos combinar multiplas restricoes:
+
+  ```csharp
+  "/{id:alpha:minlength(6)?}"
+  ```
+
+  OU
+
+  ```csharp
+  Using Microsoft.AspNetCore.Routing.CompositeRouteConstraint;
+  constraints: new {
+    id = new CompositeRouteConstraint(
+    new IRouteConstraint[] {
+    new AlphaRouteConstraint(),
+    new MinLengthRouteConstraint(6)
+  })};
+  ```
+
+- Action Selector:
+  Action selector é o atributo que pode ser aplicado aos métodos de ação do controlador. Esses atributos ajudam o Routing Engine a selecionar o método de ação correto para manipular a URL fornecida.
+
+  Existem 3 tipos de Action Selectors:
+
+  1. Action Name
+     Define o nome da acao. O Route Engine vai usar esse nome ao inves do nome do metodo para corresponder ao action name routing segmnet. Use ese atributo quando quiser criar um "apelido" par ao Action Method.
+
+  ```csharp
+  [ActionName("Modify")]
+  public string Edit()
+  {
+      return "Hello from Edit Method";
+  }
+  //O Action Name para o metodo Edit eh alterado para "Modify", atraves do atributo ActionName. Nao podemos mais invocar o metodo usando o nome Edit, mas sim o actionName modify na URL.
+  ```
+
+  2. Non Action
+     Os Actions Methods sao metodos publicos no Controller que podem ser chamados por qualquer pessoa simplesmente inserindo a URL no navegador. Para fazer com que um metodo especifico nao seja um Action Method, basta utlizar o atributo NonAction.
+
+  ```csharp
+    public class HomeController : Controller
+    {
+        [NonAction]
+        public string Edit()
+        {
+            return "Hello from Edit Method";
+        }
+    }
+  ```
+
+  3. Action Verbs
+     Sao usados quadno queremos controlar o Action Method baseado no metodo HTTP request. Para isso usamos os HTTP Attribrutes, como HttpGet, HttpPost, etc.
+     Devemos inserir o namespace Microsoft.AspNetCore.Mvc.Routing
+     Quando o cliente faz a request usando um verbo especifico, o Route Engine procura pelo Controller Action que possui o atributo especifico para esse verbo.
+     O HTTP Attributes permite definir 2 metodos com mesmo nome porem com diferentes verbos HTTP.
+
+     ```csharp
+     [HttpGet]
+      public ActionResult Edit(string id)
+      {
+          //Return the Edit Form
+          return View();
+      }
+
+      [HttpPost]
+      public ActionResult Edit(model Model)
+      {
+          //Update the database here
+      }
+     ```
+
+     HttpGet:
+     Restringe o Action Method a solicitacao HTTP que usar o verbo GET. As strings de consulta sao automaticamente anexadas como parametros e o HttpGet eh usado para recuperar um recurso do servidor.
+
+     ```csharp
+     [HttpGet]
+     public IEnumerable<product> GetAll()
+     {
+        return db.Products.ToList();
+     }
+
+     [HttpGet("{id}")]
+     public IActionResult GetById(long id)
+     {
+        var product= db.Products.Where(e => e.ProductID == id);
+        return View(product);
+     }
+     ```
+
+     HttpPost:
+     Restringe o Action Method ao HTTP request que usa o verbo POST. Sendo usado para criar um novo registro.
+
+     ```csharp
+      [HttpPost]
+      public IActionResult Create(Product product)
+      {
+         if (product == null)
+         {
+           return BadRequest();
+         }
+         db.Products.Add(product);
+         db.SaveChanges();
+         return RedirectToAction("Index");
+      }
+     ```
+
+     HttpDelete:
+     Restringe o Action Method ao HTTP request que usar o verbo DELETE. Eh usado para excluir um recurso existente.
+
+     HttpPut:
+     Restringe o Action Method ao HTTP request que usar o verbo PUT. Eh usado para atualizar ou criar um recurso.
+
+     HttpHead:
+     Restringe o Action Method ao HTTP request que usa o verbo HEAD. Esse verbo eh usado para recuperar somente as informacoes do cabecalho HTTP. Eh identico ao GET, exceto que o servidor nao retorna uma mnesagem no body.
+
+     HttpOptions:
+     Restringe o Action Method ao HTTP request que usar o verbo OPTION. Este método recupera as informações sobre as opções de comunicação suportadas pelo servidor web.
+
+     HttpPatch:
+     Restringe o Action Method ao HTTP request que usar o verbo PATCH. Este método é usado para atualizar total ou parcialmente o recurso.
+
+     Voce pode utilizar varios verbos em conjunto com o atributo AcceptVerbs:
+     O atributo HTTP AcceptVerbs permite o uso de multiplos verbos em um Action Method.
+
+     ```csharp
+      [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
+      public ActionResult AboutUs()
+      {
+          return View();
+      }
+     ```
+
+- ActionResults:
+  A classe base Controller implementa vários tipos de resultados prontos para uso, o que ajuda a construir vários tipos de resultados, que podem ser enviados de volta ao cliente. Por exemplo, o ViewResult retorna a resposta HTML. Um RedirectResult redirecionará para outra URL, etc. O ContentResult retorna uma string. Esses tipos de resultados são conhecidos coletivamente como Action results.
+  Deve-se usar o namespace Microsoft.AspNetCore.Mvc
+
+  IActionResult eh uma intrface no qual efine um contrato que representa o resultado de um metodo de acao.
+
+  ActionResult eh uma classe abstrata que implementa IActionResult.
+
+  Action results como ViewResult, PartialViewResult, JsonResult, ContentResult, etc, derivam da classe base ActionResult.
+
+  Existem metodos auxiliares (Helper Methods) que simplificam a implementacao do ActionResult. Geralmente o Helper Method elimina a palavra "Result" do seu nome do metodo. Exemplo:
+
+  ```csharp
+  //Sem metodo auxiliar
+  public class HomeController : Controller {
+    public ContentResult Index()
+    {
+        ContentResult v = new ContentResult();
+        v.Content = "Hello World";
+        return v;
+    }
+  }
+
+  //Com metodo auxiliar
+  public class HomeController : Controller {
+    public ContentResult Index()
+    {
+      return Content("Hello"); //Content Method invoca ContentResult internamente.
+    }
+  }
+  ```
+
+  O tipo de retorno:
+  No exemplo acima retornamos o ContentResult, porem eh preferivel retornar o ActionResult como tipo de retorno. Isso faz com que possamos usar qualquer Action Result.
+
+  ```csharp
+  public ActionResult Index(int id)
+  {
+    if (id==0) {
+       return NotFound();
+    }
+    else  {
+       return Content("Hello");
+    }
+  }
+  //Retorna 2 Action Results, NotFoundResult e ContentResult dependendo do parametro.
+  ```
+
+  Podemos classificar os ActionResults de acordo com seu uso:
+
+  1. Renderizando HTML:
+     Existem 2 ActionResults que usama o Model para renderizar respostas HTML.
+
+     ViewResult:
+     O metodo View() procura a View na pasta Views/<Controller> para localizar o arquivo .cshtml e o analisa usando o mecanismo de visualiacao Razor. Tambem eh possivel injetar os dados do Model na View. O metodo View retorna o ViewResult o qual renderiza a resposta HTML.
+
+     ```csharp
+     public class HomeController : Controller {
+      public ActionResult Index()
+      {
+        var movie = new Movie() {Name = "Avatar"};
+        return View(movie); //Metodo Index() invoca o metodo View() que retorna o ViewResult
+      }
+     }
+     ```
+
+     PartialViewResult:
+     Usamos ViewResult para obeter a View completa, e o resultado da PartialView retorna uma parte da View. Esse tipo eh util em Single Page Applications (SPA) onde queremos atualizar uma parte da View atraves de chamadas AJAX.
+
+     ```csharp
+     public class HomeController : Controller {
+     public ActionResult Index()
+        {
+            var movie = new Movie() { Name = "Avatar" };
+            return PartialView(movie);
+        }
+     }
+     ```
+
+  2. Rediecionando Usuarios:
+     Os resultados de redirecionamento sao uteis quando voce quer redirecionar o cliente para outra URL.
+     Existem 4 tipos de Redirect results e todos podem retornar qualquer um desses status code:
+     302 Found (Temporarily moved)  
+     301 Moved Permanently
+     307 Temporary Redirect
+     308 Permanent Redirect
+
+     RedirectResult:
+     Redirecionará o usuário para a URL relativa ou absoluta fornecida.
+
+     ```csharp
+      Redirect("/Product/Index"); //302 Found (Temporarily moved)
+      RedirectPermanent("/Product/Index"); //301 Moved Permanently
+      RedirectPermanentPreserveMethod("/Product/Index"); //308 Permanent Redirect
+      RedirectPreserveMethod("/Product/Index"); //307 Temporary Redirect
+
+      //Voce Tambem pode usar o metodo RedirectResult direto. Sua sintaxe eh:
+      //RedirectResult(string url, bool permanente, bool preserveMethod)
+      return new RedirectResult(url:"/Product/Index", permanent: true, preserveMethod: true);
+     ```
 
 5.  Como funciona MVC no ASP .NET Core:
     =(Request)=>[CONTROLLER]=(Builds)=>[MODEL]=(Renders)=>[VIEW]=(HTML)=>
@@ -1722,3 +2082,15 @@ endpoints.MapGet("/", async context =>
 - Thread-Safe: Capacidade de um método ou classe de ser usado simultaneamente por múltiplas threads sem causar corrupção de dados ou resultados imprevisíveis.
   Classe Random: Não é thread-safe, o que significa que o uso simultâneo por múltiplas threads pode levar a problemas de concorrência.
   Soluções: Usar bloqueios (lock) ou ThreadLocal<Random> para garantir segurança em contextos multi-thread.
+
+```
+
+```
+
+```
+
+```
+
+```
+
+```
