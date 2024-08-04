@@ -1528,10 +1528,109 @@ A principal diferença é como os dados são armazenados e copiados. Tipos de va
 é um padrão de camada de Apresentação. Ele lida apenas com como e quando os dados são apresentados ao Usuário. Você precisa usar esse padrão junto com a camada de acesso a dados e a camada de negócios para criar um aplicativo web Completo.
 
 1.  Model:
-    O modelo representa os dados que precisam ser mostrados ao usuário e alguma lógica associada.
+    O modelo é uma coleção de objetos que armazenam os dados do seu aplicativo que precisam ser mostrados ao usuário e podem conter alguma lógica associada.
     O Model não depende e não deve depender do Controller ou View.
     A única responsabilidade do Model é manter os dados.
     A classe do Model é reutilizável.
+    O model pode ser um Domain model, View Model ou Edit Model.
+    O MVC Design Pattern é um Padrão de camada de Apresentação. Model no MVC Pattern significa View Model e Edit Model. A maioria das pessoas usa o termo View Model para View Model e Edit Model.
+
+            - Domain Model:
+              Um Domain Model representa o objeto que representa os dados no banco de dados. O Domain Model geralmente tem um relacionamento um para um com as tabelas no banco de dados.
+              Está relacionado à camada de acesso a dados da nossa aplicação. Eles são recuperados do banco de dados ou persistidos no banco de dados pela camada de acesso a dados.
+              Os Domain Models também são chamados de entity model ou data model.
+
+              ```csharp
+              public class Product
+              {
+              public int ProductId { get; set; }
+              public string Name { get; set; }
+
+              public Decimal Price { get; set; }
+              public int Rating { get; set; }
+
+              public Brand Brand { get; set; }
+              public Supplier Supplier { get; set; }
+              }
+              ```
+
+            - View Model:
+              O View Model se refere aos objetos que contêm os dados que precisam ser mostrados ao usuário.
+              O View Model está relacionado à camada de apresentação da nossa aplicação. Eles são definidos com base em como os dados são apresentados ao usuário, em vez de como eles são armazenados.
+              Ele pode conter dados de mais de uma entidade do banco de dados.
+
+              O ViewModel é muito útil quando você tem uma UI complexa, onde os dados precisam ser extraídos de vários domain models.
+              Como os ViewModels são desconectados do domain model, isso dá a flexibilidade de usá-los da maneira que você achar melhor.
+              ViewModel torna o aplicativo mais seguro, pois você não precisa expor propriedades potencialmente perigosas como UserRole, isAdmin no ViewModel.
+
+              O ViewModel é passado do Controller para a View usando o ViewBag ou o ViewData.
+              O ViewData retorna um ViewDataDictionary, enquanto o ViewBag é apenas um wrapper em torno do ViewData, que fornece as propriedades dinâmicas.
+              O ViewDataDictionary contém um generic dictionary object e contém uma propriedade especial chamada Model.
+              A propriedade Model nos permite passar um ViewModel para a view. Esta Model Property nos permite criar as views fortemente tipadas.
+
+              Mantenha o Domain Model e o ViewModel separados:
+              Evite usar o DomainModel como o ViewModel. Você pode expor as propriedades potencialmente perigosas na View. Os Domain Models são persistidos no banco de dados usando a Data Access layer. Portanto, as propriedades expostas podem ser atualizadas/inseridas no banco de dados acidentalmente ou por um invasor.
+
+              Crie visualizações fortemente tipadas:
+              Na Strongly typed View, deixamos a View saber o tipo de ViewModel que está sendo passado para ela. Com a strongly typed view, você obterá ajuda do Intellisense e verificação de erros de tempo de compilação.
+
+              Use Data Annotations para Validações:
+              Use Data Annotations para decorar as Propriedades do ViewModel e aproveitar a Validação do lado do cliente no ASP.NET Core MVC.
+
+              Coloque apenas os dados necessários no ViewModel:
+              Coloque Apenas os campos que precisam ser exibidos ao usuário no ViewModel.
+
+              Use um Mapper  para converter Model em ViewModel:
+              O Model recuperado do banco de dados precisa ser mapeado para o ViewModel. Você pode obter ajuda de ferramentas como o AutoMapper para fazer esse trabalho.
+
+              ViewModel pode conter o comportamento específico da View:
+              Idealmente, o ViewModel deve conter apenas dados e nenhuma lógica nele. Mas você pode adicionar uma lógica especifica ao ViewModel.
+
+              Use um ViewModel por visualização:
+              Crie um ViewModel para cada View. Ou seja, há um relacionamento um para um entre Views e ViewModels.
+
+              Ser consistente:
+              Use ViewModel mesmo para cenários simples. Isso ajuda a manter a consistência em todo o aplicativo
+
+              ```csharp
+              //Por exemplo, no modelo de produto acima, o usuário precisa ver o nome da marca e o nome do fornecedor em vez do ID da marca e do ID do fornecedor.
+              //Portanto, nosso View Model se torna
+              public class ProductViewModel
+              {
+              public int ProductId { get; set; }
+              public string Name { get; set; }
+
+              public Decimal Price { get; set; }
+              public int Rating { get; set; }
+
+              public string BrandName { get; set; }
+              public string SupplierName { get; set; }
+              }
+              ```
+
+            - Edit Model:
+              O Edit Model ou Input Model representa os dados que precisam ser apresentados ao usuário para modificação/inserção.
+              O UI Requirement do produto para edição pode ser diferente do modelo necessário para visualização.
+
+              ```csharp
+              //Por exemplo, na lista de Modelos de Produto acima, o usuário precisa ver a lista de Marcas e Fornecedores, enquanto ele adiciona/edita o Produto. Portanto, nosso modelo se torna
+              public class ProductEditModel
+              {
+                public int ProductId { get; set; }
+
+                [Required(ErrorMessage = "Product Name is Required")]
+                [Display(Name = "Product Name")]
+                public string Name { get; set; }
+
+                public Decimal Price { get; set; }
+                public int Rating { get; set; }
+
+                public List<Brand> Brands { get; set; }
+                public List<Supplier> Suppliers { get; set; }
+
+                public int BrandID { get; set; }
+                public int SupplierID { get; set; }
+              }
 
 2.  View:
     A view é uma representação visual do Model.
@@ -1539,12 +1638,32 @@ A principal diferença é como os dados são armazenados e copiados. Tipos de va
     A view é conectada a um Model, acessa seus dados e os mostra ao usuário. Ela pode atualizar o Model e enviá-lo de volta ao Controller para atualização do banco de dados.
     A view nunca acessará a camada de negócios ou a camada de dados.
 
+    O folder Shared eh onde as Views que sao compartilhadas no codigo em outras Views ficam armazenadas. Os layouts compartilhados por exemplo ficam la.
+
+    O ViewData deriva de ViewDataDictionary, então ele tem propriedades de dicionário que podem ser úteis, como ContainsKey, Add, Remove, e Clear.
+    ViewBag deriva de DynamicViewData, então permite a criação de propriedades dinâmicas usando notação de ponto (@ViewBag.SomeKey = <valor ou objeto>), e nenhuma conversão é necessária. A sintaxe de ViewBag torna mais rápido adicionar controladores e visualizações.
+    O ViewData permite usar espaços em branco em chaves, pois são strings. Por exemplo ViewData[“Some Key With Whitespace”]. Isso não é possível com ViewBag.
+    O ViewData requer typecasting para tipos de dados diferentes de valores de string. Ele também precisa verificar valores nulos para evitar erros. É mais simples verificar valores nulos usando Viewbag. Exemplo @ViewBag.Person?.Name
+    O ViewData e ViewBag pode passar dados do Controller para View. Não pode ser usado para passar dados de um Controller para outro controller.
+
     - A View tem as seguintes responsabilidades:
       Responsável por interagir com o Usuário
       Renderizar o Model para o usuário
       Aceita a interação do usuário e passa ao Controller
       Consiste em páginas HTML padrão / Javascript e CSS
       Deve ser capaz de renderizar JSON, XML e tipos de retorno personalizados
+
+    - Razor View Engine:
+      O Controller Action Method retorna diferentes tipos de resposta (os ActionResults).
+      O ViewResult eh um tipo de ActionResult que produz uma resposta HTML.
+      Esses ViewResult sao produzidos pela View Engine.
+      Quando o Controller Action Method invoca o View() ou PartialView(), ele invoca o View Engine, que produz a resposta HTML.
+      O Razor View Engine é o View Engine padrão para o ASP.NET Core. Ele procura o Razor markup no View File, analisa-o e produz a resposta HTML.
+
+    - Razor Markup:
+      O Controller no MVC invoca a View passando os dados para renderizar. As Views devem ter a capacidade de processar os dados e gerar uma resposta. Isso é feito usando a marcação Razor, que nos permite usar código C# em um arquivo HTML.
+      O Razor View Engine processa essas marcações para gerar o HTML.
+      Os arquivos que contêm marcação Razor geralmente têm uma extensão .cshtml de arquivo.
 
 3.  Controller:
     O Controller recebe a solicitação. Ele então constrói o Model e seleciona a View para exibi-lo. Ele fica entre a View e o Model. Você pode pensar nele como uma cola que une o Model à View.
@@ -1763,8 +1882,8 @@ app.MapControllerRoute(
   }
   ```
 
-No convetion-based routing, todo roteamento eh configurado no Program.cs, enquanto que atraves do Attribute routing, o roteamento eh configurado direto no Controller.
-Podemos usar os 2 tipos no mesmo projeto, porem se voce definir Attribute routing em uma Action, entao convetion-based routing nao pode ser usada nessa Action.
+No convention-based routing, todo roteamento eh configurado no Program.cs, enquanto que atraves do Attribute routing, o roteamento eh configurado direto no Controller.
+Podemos usar os 2 tipos no mesmo projeto, porem se voce definir Attribute routing em uma Action, entao convention-based routing nao pode ser usada nessa Action.
 MapControllerRoute e MapControllers escondem todas as complexidades de configuração do Endpoint de nós. Ambos configuram o Endpoint para os Controllers Action Methods.
 
 Você também pode criar um Endpoint para um delegate personalizado usando o metodo MapGet.
@@ -1881,7 +2000,7 @@ endpoints.MapGet("/", async context =>
   ```
 
   3. Action Verbs
-     Sao usados quadno queremos controlar o Action Method baseado no metodo HTTP request. Para isso usamos os HTTP Attribrutes, como HttpGet, HttpPost, etc.
+     Sao usados quando queremos controlar o Action Method baseado no metodo HTTP request. Para isso usamos os HTTP Attribrutes, como HttpGet, HttpPost, etc.
      Devemos inserir o namespace Microsoft.AspNetCore.Mvc.Routing
      Quando o cliente faz a request usando um verbo especifico, o Route Engine procura pelo Controller Action que possui o atributo especifico para esse verbo.
      O HTTP Attributes permite definir 2 metodos com mesmo nome porem com diferentes verbos HTTP.
@@ -1902,7 +2021,7 @@ endpoints.MapGet("/", async context =>
      ```
 
      HttpGet:
-     Restringe o Action Method a solicitacao HTTP que usar o verbo GET. As strings de consulta sao automaticamente anexadas como parametros e o HttpGet eh usado para recuperar um recurso do servidor.
+     Restringe o Action Method a solicitacao HTTP que usa o verbo GET. As strings de consulta sao automaticamente anexadas como parametros e o HttpGet eh usado para recuperar um recurso do servidor.
 
      ```csharp
      [HttpGet]
@@ -1963,10 +2082,10 @@ endpoints.MapGet("/", async context =>
      ```
 
 - ActionResults:
-  A classe base Controller implementa vários tipos de resultados prontos para uso, o que ajuda a construir vários tipos de resultados, que podem ser enviados de volta ao cliente. Por exemplo, o ViewResult retorna a resposta HTML. Um RedirectResult redirecionará para outra URL, etc. O ContentResult retorna uma string. Esses tipos de resultados são conhecidos coletivamente como Action results.
+  A classe base Controller implementa vários tipos de resultados prontos para uso, o que ajuda a construir vários tipos de resultados que podem ser enviados de volta ao cliente. Por exemplo, o ViewResult retorna a resposta HTML. Um RedirectResult redirecionará para outra URL, etc. O ContentResult retorna uma string. Esses tipos de resultados são conhecidos coletivamente como Action results.
   Deve-se usar o namespace Microsoft.AspNetCore.Mvc
 
-  IActionResult eh uma intrface no qual efine um contrato que representa o resultado de um metodo de acao.
+  IActionResult eh uma intrface no qual define um contrato que representa o resultado de um metodo de acao.
 
   ActionResult eh uma classe abstrata que implementa IActionResult.
 
@@ -2012,56 +2131,321 @@ endpoints.MapGet("/", async context =>
 
   Podemos classificar os ActionResults de acordo com seu uso:
 
-  1. Renderizando HTML:
-     Existem 2 ActionResults que usama o Model para renderizar respostas HTML.
+  1.  Renderizando HTML:
+      Existem 2 ActionResults que usama o Model para renderizar respostas HTML.
 
-     ViewResult:
-     O metodo View() procura a View na pasta Views/<Controller> para localizar o arquivo .cshtml e o analisa usando o mecanismo de visualiacao Razor. Tambem eh possivel injetar os dados do Model na View. O metodo View retorna o ViewResult o qual renderiza a resposta HTML.
+      ViewResult:
+      O metodo View() procura a View na pasta Views/<Controller> para localizar o arquivo .cshtml e o analisa usando o mecanismo de visualizacao Razor. Tambem eh possivel injetar os dados do Model na View. O metodo View retorna o ViewResult o qual renderiza a resposta HTML.
 
-     ```csharp
-     public class HomeController : Controller {
-      public ActionResult Index()
-      {
-        var movie = new Movie() {Name = "Avatar"};
-        return View(movie); //Metodo Index() invoca o metodo View() que retorna o ViewResult
+      ```csharp
+      public class HomeController : Controller {
+       public ActionResult Index()
+       {
+         var movie = new Movie() {Name = "Avatar"}; //Model
+         return View(movie); //Metodo Index() invoca o metodo View() que retorna o ViewResult
+       }
       }
-     }
-     ```
+      ```
 
-     PartialViewResult:
-     Usamos ViewResult para obeter a View completa, e o resultado da PartialView retorna uma parte da View. Esse tipo eh util em Single Page Applications (SPA) onde queremos atualizar uma parte da View atraves de chamadas AJAX.
+      PartialViewResult:
+      Usamos ViewResult para obeter a View completa, e o resultado da PartialView retorna uma parte da View. Esse tipo eh util em Single Page Applications (SPA) onde queremos atualizar uma parte da View atraves de chamadas AJAX.
 
-     ```csharp
-     public class HomeController : Controller {
-     public ActionResult Index()
+      ```csharp
+      public class HomeController : Controller {
+      public ActionResult Index()
+         {
+             var movie = new Movie() { Name = "Avatar" };
+             return PartialView(movie);
+         }
+      }
+      ```
+
+  2.  Rediecionando Usuarios:
+      Os resultados de redirecionamento sao uteis quando voce quer redirecionar o cliente para outra URL.
+      Existem 4 tipos de Redirect results e todos podem retornar qualquer um desses status code:
+      302 Found (Temporarily moved)  
+      301 Moved Permanently
+      307 Temporary Redirect
+      308 Permanent Redirect
+
+           RedirectResult:
+           Redirecionará o usuário para a URL relativa ou absoluta fornecida.
+
+           ```csharp
+            Redirect("/Product/Index"); //302 Found (Temporarily moved)
+            RedirectPermanent("/Product/Index"); //301 Moved Permanently
+            RedirectPermanentPreserveMethod("/Product/Index"); //308 Permanent Redirect
+            RedirectPreserveMethod("/Product/Index"); //307 Temporary Redirect
+
+            //Voce Tambem pode usar o metodo RedirectResult direto. Sua sintaxe eh:
+            //RedirectResult(string url, bool permanente, bool preserveMethod)
+            return new RedirectResult(url:"/Product/Index", permanent: true, preserveMethod: true);
+           ```
+
+           LocalRedirectResult:
+           EH similar ao RedirectResult porem so aceita URL locais. Se voce fornecer uma URL externa, o metodo lançara um InvalidOperationException. Isso nos ajuda contra ataques de redirecionamento aberto.
+
+           ```csharp
+            LocalRedirect("/Product/Index"); //302 Found (Temporarily moved)
+            LocalRedirectPermanent("/Product/Index"); //301 Moved Permanently
+            LocalRedirectPermanentPreserveMethod("/Product/Index"); //308 Permanent Redirect
+            LocalRedirectPreserveMethod("/Product/Index"); //307 Temporary Redirect
+           ```
+
+           RedirectToActionResult:
+           Redireciona o cliente para um Action e Controller especifico. Ele recebe o nome da ação, o nome do controlador e o valor da rota.
+
+           RedirectToAction -	302 Found (Temporarily moved)
+           RedirectToActionPermanent - 301 Moved Permanently
+           RedirectToActionPermanentPreserveMethod -	308 Permanent Redirect
+           RedirectToActionPreserveMethod	- 307 Temporary Redirect
+
+           ```csharp
+            //Redireciona para a Action Index em AboutUsController
+            RedirectToAction(actionName: "Index", controllerName: "AboutUs");
+
+            //Redireciona para a Action Index no Controller atual
+            RedirectToAction(actionName: "Index");
+           ```
+
+           RedirectToRouteResult:
+           rRdireciona o cliente para uma rota específica. Ele pega um nome da rota ou valor da rota e nos redireciona para essa rota com os valores da rota fornecidos.
+
+           RedirectToRoute - 302 Found (Temporarily moved)
+           RedirectToRoutePermanent -	301 Moved Permanently
+           RedirectToRoutePermanentPreserveMethod -	308 Permanent Redirect
+           RedirectToRoutePreserveMethod - 307 Temporary Redirect
+
+           ```csharp
+            // Redireciona usando o nome da rota
+            return RedirectToRoute("default");
+
+            // Redireciona usando o valor da rota
+            var routeValue = new RouteValueDictionary(new { action = "Index", controller = "Home"});
+            return RedirectToRoute(routeValue);
+           ```
+
+  3.  Retornando arquivos:
+
+      - FileResult:
+        Usa a açao do Controller para fornecer arquivos ao usuario.
+        Eh uma classe base abstrata que eh usada para enviar conteúdo de arquivo binário para o response.
+        Eh implementado por FileContentResult, FileStreamResult, VirtualFileResult e PhysicalFileResult. Essas classes cuidam de retornar arquivos ao cliente.
+
+        - FileContentResult:
+          Lê de um array de bytes e retorna como um arquivo.
+
+          ```csharp
+          return new FileContentResult(byteArray, "application/pdf")
+          ```
+
+        - FileStreamResult:
+          Lê de um stream e retorna como um arquivo.
+
+          ```csharp
+          return new FileStreamResult(fileStream, "application/pdf");
+          ```
+
+        - VirtualFileResult:
+          O resultado dessa ação lê o conteúdo de um arquivo de um caminho relativo ao aplicativo no host e envia o conteúdo ao cliente como um arquivo.
+
+          ```csharp
+          return new VirtualFileResult("/path/filename", "application/pdf");
+          ```
+
+        - PhysicalFileResult:
+          Esse resultado da ação lê o conteúdo de um arquivo de um local físico e envia o conteúdo para o cliente como um arquivo. Observe que o caminho deve ser um caminho absoluto.
+
+          ```csharp
+          return new PhysicalFileResult("c:/path/filename", "application/pdf");
+          ```
+
+  4.  Resultados de Conteudos:
+
+      - JsonResult:
+        Retorna os dados formatados em JSON. Ele serializa o objeto fornecido em JSON e o retorna ao cliente.
+
+        ```csharp
+        public JsonResult About()
         {
-            var movie = new Movie() { Name = "Avatar" };
-            return PartialView(movie);
+            return Json(object);
         }
-     }
-     ```
 
-  2. Rediecionando Usuarios:
-     Os resultados de redirecionamento sao uteis quando voce quer redirecionar o cliente para outra URL.
-     Existem 4 tipos de Redirect results e todos podem retornar qualquer um desses status code:
-     302 Found (Temporarily moved)  
-     301 Moved Permanently
-     307 Temporary Redirect
-     308 Permanent Redirect
+        //or
 
-     RedirectResult:
-     Redirecionará o usuário para a URL relativa ou absoluta fornecida.
+        public JsonResult About()
+        {
+            return new JsonResult(object);
+        }
+        ```
 
-     ```csharp
-      Redirect("/Product/Index"); //302 Found (Temporarily moved)
-      RedirectPermanent("/Product/Index"); //301 Moved Permanently
-      RedirectPermanentPreserveMethod("/Product/Index"); //308 Permanent Redirect
-      RedirectPreserveMethod("/Product/Index"); //307 Temporary Redirect
+      - ContentResult:
+        Grava o conteúdo especificado diretamente na response como dados de string formatados em texto simples.
 
-      //Voce Tambem pode usar o metodo RedirectResult direto. Sua sintaxe eh:
-      //RedirectResult(string url, bool permanente, bool preserveMethod)
-      return new RedirectResult(url:"/Product/Index", permanent: true, preserveMethod: true);
-     ```
+        ```csharp
+        public ContentResult About()
+        {
+            return Content("Hello World");
+        }
+
+        //or
+
+        public ContentResult About()
+        {
+            return new ContentResult() { Content = "Hello World" };
+        }
+        ```
+
+      - EmptyResult:
+        Como o nome sugere não retorna nada. Use isso quando quiser executar alguma lógica do controlador, mas não quiser retornar nada.
+
+        ```csharp
+        return new EmptyResult();
+        ```
+
+  5.  Retornando Erros e HTTP Codes:
+      Os Action Results nesta seção são geralmente usados ​​no controlador da Web API. Esses resultados enviam um código de status HTTP de volta ao cliente. Alguns deles também podem enviar um objeto na resposta.
+
+      - StatusCodeResult:
+        Envia um HTTP status code especifico ao cliente.
+
+        ```csharp
+        return StatusCode(200);
+        or
+        return new StatusCodeResult(200);
+        ```
+
+      - ObjectResult:
+        Usara a negociaçao do conteudo para enviar um objeto ao cliente e definir o HTTP 200 status code. O overload do metodo StatusCode pode atribuir um objeto como segundo argumento e retornar um ObjectResult.
+
+        ```csharp
+          return StatusCode(200, new { message = "Hello" });
+          // or
+          return new ObjectResult(new { message = "Hello" });
+          //Nota: O metodo Helper StatusCode pode enviar qualquer status code junto com um objeto.
+        ```
+
+      - OkResult:
+        Envia um HTTP 200 status code ao cliente.
+
+        ```csharp
+          return Ok();
+          // or
+          return new OkResult();
+        ```
+
+      - OkObjectResult:
+        Envia um HTTP 200 status code ao cliente com um objeto.
+
+        ```csharp
+          return Ok(new {message="Hello"});
+          or
+          return new OkObjectResult(new { message = "Not found" });
+        ```
+
+      - CreatedResult:
+        Eh usado quando uma Resource eh criada depois de uma requisiçao Post. O CreatedResult envia o status Code 201 juntamente com o objeto criado.
+
+        ```csharp
+          return Created(new Uri("/Home/Index", UriKind.Relative), new {message="Hello"});
+          //or
+          return new CreatedResult(new Uri("/Home/Index", UriKind.Relative), new { message = "Hello" });
+        ```
+
+      - CreatedAtActionResult:
+        Similiar ao CreatedResult porem leva os nomes do Controller e Action ao inves do Uri.
+
+        ```csharp
+          return CreatedAtAction("Index", new {message="Hello World"});
+        ```
+
+      - CreatedAtRouteResult:
+        Pega valores da rota e eh similiar ao CreatedResult e CreatedAtActionResult.
+
+        ```csharp
+        CreatedAtRoute("default", new { mesage = "Hello World" });
+        ```
+
+      - BadRequestResult:
+        Envia um HTTP 400 Status Code ao cliente. Use esse Status Code response para indicar a sintaxe inválida ou solicitação que não pode ser entendida.
+
+        ```csharp
+        return BadRequest()
+        ```
+
+      - BadRequestObjectResult:
+        Similar ao BadRequestResult. A diferenca eh que voce pode enviar ModelStateDictionary (que é um objeto contendo detalhes do erro) junto com o código de status 400.
+
+        ```csharp
+          var modelState = new ModelStateDictionary();
+          modelState.AddModelError("message", "errors found. Please rectify before continuing");
+          return BadRequest(modelState);
+        ```
+
+      - NotFoundResult:
+        Envia um HTTP 404 status code ao cliente.
+
+        ```csharp
+          return NotFound();
+        ```
+
+      - NotFoundObjectResult:
+        Similar ao NotFoundResult porem retorna um objeto juntamente com o 404 status code. O overload do metodo Helper do NotFound recebe um objeto como argumento e retorna o NotFoundObjectResult.
+
+        ```csharp
+        return NotFound( new { message = "Not found" });
+        ```
+
+      - UnsupportedMediaTypeResult:
+        Envia um HTTP 415 status code ao cliente. Ue esse Action Result quando a requisicao estiver em um formato nao suportado pelo servidor.
+
+        ```csharp
+        return new UnsupportedMediaTypeResult();
+        ```
+
+      - NoContentResult:
+        Envia um HTTP 204 status code ao cliente. Ue esse Action Result quando a solicitação é atendida, mas não há conteúdo para enviar de volta ao cliente.
+
+        ```csharp
+        return NoContent();
+        ```
+
+  6.  Resultados relacionados à segurança:
+
+      SignInResult:
+      Representa o resultado de uma operação de login.
+      O SignInManager.SignInAsync ou PasswordSignInAsync retorna SignInResult, que tem quatro propriedades: Succeeded, IsLockedOut, IsNotAllowed e RequiresTwoFactor.
+
+      SignOutResult:
+      Representa o resultado de uma operação de logout.
+
+      ForbidResult:
+      Retorna o 403 (Forbidden) status code quando um usuário não está autorizado a executar a operação solicitada no recurso fornecido.
+      ForbidResult não significa que o usuário não esteja autenticado. Os usuários não autenticados devem obter ChallengeResult ou UnauthorisedResult.
+
+      ```csharp
+       return new ForbidResult();
+       //or
+       return Forbid();
+       // O Forbid é um método na classe base do controlador que retorna a instância do ForbidResult
+
+       //Como alternativa, você também pode usar o resultado do StatusCode
+       return StatusCode(403);
+      ```
+
+      ChallengeResult:
+      Ocorre quando a autenticação do usuário falha. Este resultado informará ao middleware de autenticação para tomar a resposta apropriada, por exemplo retornando um 401 (Unauthorized) ou 403 (Forbidden) status code,, ou redirecionando o usuário para uma login page.
+
+      UnauthorizedResult:
+      Retorna um "401 – Unauthorized” HTTP response status code.
+      O método da classe base Unauthorized retornar uma instância de UnauthorizedResult.
+      A diferença entre UnauthorisedResult e ChallengeResult eh que o primeiro apenas retorna um código de status e não faz mais nada com ele.
+
+      ```csharp
+      return Unauthorized();
+      //or
+      return new UnauthorizedResult();
+      ```
 
 5.  Como funciona MVC no ASP .NET Core:
     =(Request)=>[CONTROLLER]=(Builds)=>[MODEL]=(Renders)=>[VIEW]=(HTML)=>

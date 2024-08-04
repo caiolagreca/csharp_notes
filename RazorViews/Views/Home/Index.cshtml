@@ -1,0 +1,31 @@
+﻿<h3>Code block</h3>
+
+@{
+    var greeting = "Welcome to our site!";
+    var weekDay = DateTime.Now.DayOfWeek;
+}
+@{
+    // Since Product isn't a string, it requires a cast.
+    var product = ViewData["Product"] as ProductModel;
+}
+
+<p>@greeting</p>
+
+
+@ViewData["Greeting"]!
+
+@product.ProductID<br>
+@product.Name<br>
+@product.Brand<br>
+@product.Price<br>
+
+@* Using ViewBag
+
+@ViewBag.Greeting World <br>
+
+@ViewBag.product.ProductID<br>
+@ViewBag.product.Name<br>
+@ViewBag.product.Brand<br>
+@ViewBag.product.Price<br>
+
+*@
