@@ -1066,6 +1066,7 @@ Existem três tipos principais de ciclos de vida das dependências:
 1. Transient:
    Uma nova instância do serviço é criada cada vez que ele é solicitado.
    Uso: Serviços leves e sem estado, que não mantêm dados entre solicitações.
+   Usa mais memória e recursos e pode ter um impacto negativo no desempenho se você tiver muitos dele.
 
 ```csharp
 builder.Services.AddTransient<IService, ServiceImplementation>();
@@ -1082,10 +1083,17 @@ builder.Services.AddScoped<IService, ServiceImplementation>();
 3. Singleton:
    Uma única instância do serviço é criada e compartilhada por toda a aplicação.
    Uso: Serviços pesados ou com estado que precisam ser compartilhados por toda a aplicação.
+   Quaisquer vazamentos de memória nesse serviço sera acumulado ao longo do tempo. Portanto, fique atento aos vazamentos de memória. 
+   Singletons também são eficientes em termos de memória, pois são criados uma vez e reutilizados em todos os lugares.
+   Configuração ou parâmetros do aplicativo, Logging Service, cache de dados são alguns dos exemplos onde você pode usar singletons.
 
 ```csharp
 builder.Services.AddSingleton<IService, ServiceImplementation>();
 ```
+
+Serviços com menor tempo de vida injetados em serviços com maior tempo de vida mudariam o serviço de menor tempo de vida para um tempo de vida maior. Isso tornará a depuração do aplicativo muito difícil e deve ser evitado a todo custo.
+Sendo assim, Nunca injete Scoped e Transient services no Singleton service.
+Nunca injete Transient services no Scoped service.
 
 # Como JWT Tokens funcionam:
 
