@@ -1083,7 +1083,7 @@ builder.Services.AddScoped<IService, ServiceImplementation>();
 3. Singleton:
    Uma única instância do serviço é criada e compartilhada por toda a aplicação.
    Uso: Serviços pesados ou com estado que precisam ser compartilhados por toda a aplicação.
-   Quaisquer vazamentos de memória nesse serviço sera acumulado ao longo do tempo. Portanto, fique atento aos vazamentos de memória. 
+   Quaisquer vazamentos de memória nesse serviço sera acumulado ao longo do tempo. Portanto, fique atento aos vazamentos de memória.
    Singletons também são eficientes em termos de memória, pois são criados uma vez e reutilizados em todos os lugares.
    Configuração ou parâmetros do aplicativo, Logging Service, cache de dados são alguns dos exemplos onde você pode usar singletons.
 
@@ -1254,202 +1254,6 @@ Nginx: Muito utilizado por sua performance e flexibilidade.
 Apache: Pode ser configurado como reverse proxy com módulos apropriados.
 IIS: No ambiente Windows, pode atuar como reverse proxy.
 HAProxy: Especializado em balanceamento de carga, também pode atuar como reverse proxy.
-
-# CLI:
-
-Dotnet cli é uma ferramenta de linha de comando. Ele contém comandos que você pode usar para:
-Criar um novo projeto
-Construir um projeto
-Executar o projeto
-Publicar o projeto
-Restaurar pacotes Nuget
-Migrar de uma versão para outra do .NET
-
-A sintaxe do NET CLI consiste em três partes. O “driver”, o “verbo” e os “argumentos”
-dotnet [verbo] [argumentos]
-O driver é “dotnet”. Ele pode executar um comando ou executar um aplicativo.
-O “verbo” é o comando que você quer executar. Ele realiza uma ação.
-Os “argumentos” são argumentos que passamos para os comandos invocados.
-
-Aqui estão alguns dos comandos dotnet CLI mais comuns:
-new - Cria um novo projeto, arquivo de configuração ou solução com base no modelo especificado.
-restore - Restaura as dependências e ferramentas de um projeto.
-build - Cria um projeto e todas as suas dependências.
-publish - Empacota o aplicativo e suas dependências em uma pasta para implantação em um sistema de hospedagem.
-run Executa código-fonte sem nenhum comando explícito de compilação ou inicialização.
-test - Driver de teste .NET usado para executar testes unitários.
-vstest - Executa testes dos arquivos especificados.
-pack - Empacota o código em um pacote NuGet.
-migrate - Migra um projeto .NET Core do Preview 2 para um projeto .NET Core SDK 1.0.
-clean - Limpa a saída de um projeto.
-sln - Modifica um arquivo de solução do .NET Core.
-help - Mostra documentação mais detalhada on-line para o comando especificado.
-store - Armazena os assemblies especificados no armazenamento de pacotes de tempo de execução.
-
-Lista de Templates para criacao de projeto:
-console - Console Application
-classlib - Class library
-mstest - Unit Test Project
-xunit - xUnit Test Project
-web - ASP.NET Core Empty
-mvc - ASP.NET Core Web App (Model-View-Controller)
-razor - ASP.NET Core Web App
-angular - ASP.NET Core with Angular
-react - ASP.NET Core with React.js
-reactredux - ASP.NET Core with React.js and Redux
-webapi - ASP.NET Core Web API
-
-# Arquivo lauchnSettings.json
-
-Este arquivo json contém todas as configurações específicas do projeto necessárias para iniciar o aplicativo. Você encontrará o perfil de depuração, as variáveis ​​de ambiente que devem ser usadas, etc.
-Ele é usado somente durante o desenvolvimento do aplicativo.
-Ele contém somente as configurações necessárias para executar o aplicativo.
-Este arquivo é ignorado quando publicamos o aplicativo.
-Você encontrará o launchSettings.json na pasta properties.
-
-2. O arquivo tem duas seções. Uma é iisSettings e a outra é a seção profiles.
-   iisSettings: contém as configurações necessárias para depurar o aplicativo no IIS (Internet Information Service) ou IIS Express.
-   profiles: A seção contém os perfis de depuração. O Visual Studio cria esses perfis quando cria o projeto.
-
-Exemplo:
-
-```csharp
-{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:38034",
-      "sslPort": 44314
-    }
-  },
-  "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5117",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "https": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7120;http://localhost:5117",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    },
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
-    }
-  }
-}
-```
-
-# Dependencies Folder
-
-Esta pasta contém todas as dependências do projeto.
-O Visual Studio usa NuGet para todas as dependências do lado do servidor.
-Para as dependências do lado do cliente, o Libman é usado. Este é um desvio das versões anteriores onde NuGet é usado para dependências do lado do servidor e do lado do cliente.
-
-1. Na pasta Dependências, temos as pastas Packages , Frameworks e Analyzers.
-
-   - A pasta Packages conterá os pacotes do lado do servidor que você instalar. Esta pasta é criada somente quando você instala um novo pacote.
-
-   - A pasta Frameworks contém o framework. Ela mostra dois pacotes Microsoft.AspNetCore.App e Microsoft.NetCore.App.
-     O Microsoft.NETCore.app é o coração do .NET. Ela contém os recursos comuns necessários para construir um aplicativo .NET (Windows, web, blazer etc).
-     O Microsoft.AspNetCore.app contém os recursos relacionados apenas ao ASP.NET Core.
-
-   - A pasta Analyzers inclui pacotes que ajudam o Visual Studio a analisar o código. Por exemplo, mensagens de erro e avisos que aparecem enquanto você digita, junto com correções automáticas de código, etc.
-
-O arquivo libman.json é criado quando instalamos os pacotes de terceiros usando o libman.
-
-# program.cs file
-
-A classe Program contém o ponto de entrada dos aplicativos ASP.NET Core.
-Não há método main neste arquivo, ele é implícito.
-Todas as tarefas que foram feitas na classe startup, agora são movidas para cá a partir da versão .NET 6.0.
-Ela contém o código de inicialização do aplicativo.
-Configura e registra os serviços necessários para o aplicativo.
-Registra componentes de middleware e configura o pipeline de tratamento de solicitações do aplicativo.
-
-1. ASP.NET Core apps configuram e iniciam um arquivo host:
-   Você pode pensar em um host como um wrapper em torno do seu aplicativo. Ele é responsável pela inicialização e gerenciamento do tempo de vida do aplicativo. O host contém a configuração do aplicativo e o servidor Kestrel (servidor HTTP) que escuta solicitações e envia respostas. Ele também configura o registro, injeção de dependência, configuração, pipeline de processamento de solicitação, etc.
-   Há três hosts diferentes capazes de executar um ASP.NET Core app:
-   WebHost - foi usado nas versões iniciais do ASP.NET Core
-   Generic Host - substituiu o WebHost no ASP.NET Core 3.0
-   WebApplication (or Minimal Host) - foi introduzido no ASP.NET Core 6.0
-
-2. O WebApplication é o núcleo do seu aplicativo ASP.NET Core. Ele contém a configuração do aplicativo e o servidor HTTP (Kestrel) que escuta solicitações e envia respostas.
-   O WebApplication se comporta de forma semelhante ao Generic Host, expondo muitas das mesmas interfaces, mas exigindo menos retornos de chamada de configuração.
-   Precisamos configurar o WebApplication antes de executá-lo. Há duas tarefas essenciais que precisamos executar antes de executar o aplicativo:
-   Configurar e adicionar os serviços para injeção de dependência .
-   Configurar o pipeline de solicitações , que manipula todas as solicitações feitas ao aplicativo.
-
-Essas quatro linhas contêm todo o código de inicialização necessário para criar um servidor web e começar a escutar solicitações:
-O program.cs file cria a aplicacao web em 3 estagios - Create, Build and Run.
-As versões anteriores do ASP.NET Core criavam dois arquivos. Um é program.cs, e o outro é startup.cs (conhecido como classe startup). O program.cs é onde configuramos o host, e a classe startup é onde usamos para configurar o aplicativo. Desde o ASP.NET core 6, ambos os processos são simplificados e mesclados em um program.cs.
-
-```csharp
-/* CREATE (cria uma instancia do WebApplication).
-CreateBuilder eh um metodo estatico da classe WebApplcation e retorna uma nova isntancia da classe WebApplicationBuilder.
-Ele configura alguns recursos básicos da plataforma ASP.NET por padrão, incluindo: Configuracao do servidor HTTP (Kestrel), Logging, Configuracao, adiciona servicos ao Contêiner de injeção de dependência, Adiciona os framework-provided services. */
-var builder = WebApplication.CreateBuilder(args);
-
-/* BUILD
-O método Build da classe WebApplicationBuilder cria uma nova instância da classe WebApplication .
-Usamos a instância do WebApplication para configurar os middlewares e endpoints. */
-var app = builder.Build();
-app.MapGet("/", () => "Hello World!"); //Insere Middlewares e endpoints aqui
-
-/* RUN
-O método Run da instância WebApplication inicia o aplicativo e escuta solicitações HTTP. */
-app.Run();
-
-```
-
-# appsettings.json
-
-é uma das várias maneiras pelas quais podemos fornecer os valores de configuração para o aplicativo ASP.NET core.
-Você encontrará esse arquivo na pasta raiz do nosso projeto.
-Também podemos criar arquivos específicos do ambiente como appsettings.development.json, appsettngs.production.json, etc.
-O sistema de configuração do ASP.NET Core carrega o appsettings.json e também o arquivo específico do ambiente appsettings com base no ambiente atual.
-O appsettings armazena os valores de configuração em pares nome-valor usando o formato JSON.
-
-Exemplo:
-
-```csharp
-{
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
-    }
-  },
-  "AllowedHosts": "*"
-}
-```
-
-O núcleo do ASP.NET lê o valor da variável ASPNETCORE_ENVIRONMENT contida no launchSettings.json, para determinar o ambiente atual.
-O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT bem no início do aplicativo. Ele então cria o IWebHostEnvironment object, que podemos usar para ler o ambiente atual em qualquer lugar do aplicativo.
-
-1. O núcleo do ASP.NET usa o provedor de configuração JSON para ler as configurações. Ele as lê na seguinte ordem:
-   appsettings.json
-   appsettings.<EnvironmentName>.json :
-   Por exemplo, se o ambiente atual for Desenvolvimento, então o appsettings.development.json é carregado. Se o ambiente for Produção, então ele usa oappsettings.production.json
-   Portanto, podemos carregar diferentes configurações com base no ambiente ou aplicativo em execução.
 
 # Request Pipeline e Middlewares:
 
@@ -2467,6 +2271,255 @@ endpoints.MapGet("/", async context =>
     A View gerará a resposta apropriada. A resposta pode ser um HTML, XML, Json ou um arquivo para download. Em seguida, ela o envia de volta ao usuário.
     O ciclo da request é concluído e o aplicativo aguarda nova interação do usuário, o que iniciará um novo ciclo.
 
+# Configuration:
+
+O .NET nos permite ler os valores de configuração de várias fontes e formatos de arquivo.
+Todos eles armazenam os valores de configuração em diferentes formatos. O sistema de configuração os lê e os combina em um modelo de configuração unificado.
+Algumas das fontes comumente usadas são:
+Json files
+INI files
+XML files
+Command-line arguments
+Environment variables
+Azure Key Vault
+Azure App Configuration
+Directory files
+Encrypted User Secrets
+In-memory .NET objects
+Custom providers
+
+Não importa como e onde a configuração é armazenada, uma vez que o sistema de configuração carrega, ele os simplifica em pares chave/valor.
+Exemplo:
+
+```csharp
+{
+     "Loging" : {
+        "LogLevel" : {
+           "Default" : "Information",
+           "Microsoft": "Warning"
+        }
+    }
+}
+
+//é simplificado para o seguinte par chave/valor
+
+Loging:LogLevel:Default="Information"
+Loging:LogLevel:Microsoft="Warning"
+```
+
+Chaves não diferenciam maiúsculas de minúsculas. Por exemplo, ConnectionString e connectionstring são tratadas como chaves equivalentes.
+Os valores são strings. (Os booleanos são representados como string “True” ou “False”)
+O delimitador de hierarquia é dois pontos ( : ).
+Você também pode usar sublinhado duplo ( \_\_ ), que é convertido automaticamente em dois pontos ( : ).
+No Azure Key Vault, as chaves hierárquicas são usadas ( -- ) como separadores. O sistema de configuração as substitui automaticamente por ( : )
+
+O Default Configuration loaded carrega as configuracoes da seguinte ordem:
+
+1. appsettings.json
+2. appsettings.Environment.json Por exemplo, appsettings.Production.json e appsettings.Development.json.
+3. App secrets quando o app roda em Development environment.
+4. Environment variables.
+5. Command-line arguments.
+
+A ordem em que os arquivos de configuração são carregados é importante. Se duas fontes de configuração contiverem chaves semelhantes, a que for carregada por último vence.
+
+# CLI:
+
+Dotnet cli é uma ferramenta de linha de comando. Ele contém comandos que você pode usar para:
+Criar um novo projeto
+Construir um projeto
+Executar o projeto
+Publicar o projeto
+Restaurar pacotes Nuget
+Migrar de uma versão para outra do .NET
+
+A sintaxe do NET CLI consiste em três partes. O “driver”, o “verbo” e os “argumentos”
+dotnet [verbo] [argumentos]
+O driver é “dotnet”. Ele pode executar um comando ou executar um aplicativo.
+O “verbo” é o comando que você quer executar. Ele realiza uma ação.
+Os “argumentos” são argumentos que passamos para os comandos invocados.
+
+Aqui estão alguns dos comandos dotnet CLI mais comuns:
+new - Cria um novo projeto, arquivo de configuração ou solução com base no modelo especificado.
+restore - Restaura as dependências e ferramentas de um projeto.
+build - Cria um projeto e todas as suas dependências.
+publish - Empacota o aplicativo e suas dependências em uma pasta para implantação em um sistema de hospedagem.
+run Executa código-fonte sem nenhum comando explícito de compilação ou inicialização.
+test - Driver de teste .NET usado para executar testes unitários.
+vstest - Executa testes dos arquivos especificados.
+pack - Empacota o código em um pacote NuGet.
+migrate - Migra um projeto .NET Core do Preview 2 para um projeto .NET Core SDK 1.0.
+clean - Limpa a saída de um projeto.
+sln - Modifica um arquivo de solução do .NET Core.
+help - Mostra documentação mais detalhada on-line para o comando especificado.
+store - Armazena os assemblies especificados no armazenamento de pacotes de tempo de execução.
+
+Lista de Templates para criacao de projeto:
+console - Console Application
+classlib - Class library
+mstest - Unit Test Project
+xunit - xUnit Test Project
+web - ASP.NET Core Empty
+mvc - ASP.NET Core Web App (Model-View-Controller)
+razor - ASP.NET Core Web App
+angular - ASP.NET Core with Angular
+react - ASP.NET Core with React.js
+reactredux - ASP.NET Core with React.js and Redux
+webapi - ASP.NET Core Web API
+
+# Arquivo lauchnSettings.json
+
+Este arquivo json contém todas as configurações específicas do projeto necessárias para iniciar o aplicativo. Você encontrará o perfil de depuração, as variáveis ​​de ambiente que devem ser usadas, etc.
+Ele é usado somente durante o desenvolvimento do aplicativo.
+Ele contém somente as configurações necessárias para executar o aplicativo.
+Este arquivo é ignorado quando publicamos o aplicativo.
+Você encontrará o launchSettings.json na pasta properties.
+
+2. O arquivo tem duas seções. Uma é iisSettings e a outra é a seção profiles.
+   iisSettings: contém as configurações necessárias para depurar o aplicativo no IIS (Internet Information Service) ou IIS Express.
+   profiles: A seção contém os perfis de depuração. O Visual Studio cria esses perfis quando cria o projeto.
+
+Exemplo:
+
+```csharp
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:38034",
+      "sslPort": 44314
+    }
+  },
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "http://localhost:5117",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "https": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7120;http://localhost:5117",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
+```
+
+# Dependencies Folder
+
+Esta pasta contém todas as dependências do projeto.
+O Visual Studio usa NuGet para todas as dependências do lado do servidor.
+Para as dependências do lado do cliente, o Libman é usado. Este é um desvio das versões anteriores onde NuGet é usado para dependências do lado do servidor e do lado do cliente.
+
+1. Na pasta Dependências, temos as pastas Packages , Frameworks e Analyzers.
+
+   - A pasta Packages conterá os pacotes do lado do servidor que você instalar. Esta pasta é criada somente quando você instala um novo pacote.
+
+   - A pasta Frameworks contém o framework. Ela mostra dois pacotes Microsoft.AspNetCore.App e Microsoft.NetCore.App.
+     O Microsoft.NETCore.app é o coração do .NET. Ela contém os recursos comuns necessários para construir um aplicativo .NET (Windows, web, blazer etc).
+     O Microsoft.AspNetCore.app contém os recursos relacionados apenas ao ASP.NET Core.
+
+   - A pasta Analyzers inclui pacotes que ajudam o Visual Studio a analisar o código. Por exemplo, mensagens de erro e avisos que aparecem enquanto você digita, junto com correções automáticas de código, etc.
+
+O arquivo libman.json é criado quando instalamos os pacotes de terceiros usando o libman.
+
+# program.cs file
+
+A classe Program contém o ponto de entrada dos aplicativos ASP.NET Core.
+Não há método main neste arquivo, ele é implícito.
+Todas as tarefas que foram feitas na classe startup, agora são movidas para cá a partir da versão .NET 6.0.
+Ela contém o código de inicialização do aplicativo.
+Configura e registra os serviços necessários para o aplicativo.
+Registra componentes de middleware e configura o pipeline de tratamento de solicitações do aplicativo.
+
+1. ASP.NET Core apps configuram e iniciam um arquivo host:
+   Você pode pensar em um host como um wrapper em torno do seu aplicativo. Ele é responsável pela inicialização e gerenciamento do tempo de vida do aplicativo. O host contém a configuração do aplicativo e o servidor Kestrel (servidor HTTP) que escuta solicitações e envia respostas. Ele também configura o registro, injeção de dependência, configuração, pipeline de processamento de solicitação, etc.
+   Há três hosts diferentes capazes de executar um ASP.NET Core app:
+   WebHost - foi usado nas versões iniciais do ASP.NET Core
+   Generic Host - substituiu o WebHost no ASP.NET Core 3.0
+   WebApplication (or Minimal Host) - foi introduzido no ASP.NET Core 6.0
+
+2. O WebApplication é o núcleo do seu aplicativo ASP.NET Core. Ele contém a configuração do aplicativo e o servidor HTTP (Kestrel) que escuta solicitações e envia respostas.
+   O WebApplication se comporta de forma semelhante ao Generic Host, expondo muitas das mesmas interfaces, mas exigindo menos retornos de chamada de configuração.
+   Precisamos configurar o WebApplication antes de executá-lo. Há duas tarefas essenciais que precisamos executar antes de executar o aplicativo:
+   Configurar e adicionar os serviços para injeção de dependência .
+   Configurar o pipeline de solicitações , que manipula todas as solicitações feitas ao aplicativo.
+
+Essas quatro linhas contêm todo o código de inicialização necessário para criar um servidor web e começar a escutar solicitações:
+O program.cs file cria a aplicacao web em 3 estagios - Create, Build and Run.
+As versões anteriores do ASP.NET Core criavam dois arquivos. Um é program.cs, e o outro é startup.cs (conhecido como classe startup). O program.cs é onde configuramos o host, e a classe startup é onde usamos para configurar o aplicativo. Desde o ASP.NET core 6, ambos os processos são simplificados e mesclados em um program.cs.
+
+```csharp
+/* CREATE (cria uma instancia do WebApplication).
+CreateBuilder eh um metodo estatico da classe WebApplcation e retorna uma nova isntancia da classe WebApplicationBuilder.
+Ele configura alguns recursos básicos da plataforma ASP.NET por padrão, incluindo: Configuracao do servidor HTTP (Kestrel), Logging, Configuracao, adiciona servicos ao Contêiner de injeção de dependência, Adiciona os framework-provided services. */
+var builder = WebApplication.CreateBuilder(args);
+
+/* BUILD
+O método Build da classe WebApplicationBuilder cria uma nova instância da classe WebApplication .
+Usamos a instância do WebApplication para configurar os middlewares e endpoints. */
+var app = builder.Build();
+app.MapGet("/", () => "Hello World!"); //Insere Middlewares e endpoints aqui
+
+/* RUN
+O método Run da instância WebApplication inicia o aplicativo e escuta solicitações HTTP. */
+app.Run();
+
+```
+
+# appsettings.json
+
+é uma das várias maneiras pelas quais podemos fornecer os valores de configuração para o aplicativo ASP.NET core.
+Você encontrará esse arquivo na pasta raiz do nosso projeto.
+Também podemos criar arquivos específicos do ambiente como appsettings.development.json, appsettngs.production.json, etc.
+O sistema de configuração do ASP.NET Core carrega o appsettings.json e também o arquivo específico do ambiente appsettings com base no ambiente atual.
+O appsettings armazena os valores de configuração em pares nome-valor usando o formato JSON.
+
+Exemplo:
+
+```csharp
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}
+```
+
+O núcleo do ASP.NET lê o valor da variável ASPNETCORE_ENVIRONMENT contida no launchSettings.json, para determinar o ambiente atual.
+O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT bem no início do aplicativo. Ele então cria o IWebHostEnvironment object, que podemos usar para ler o ambiente atual em qualquer lugar do aplicativo.
+
+1. O núcleo do ASP.NET usa o provedor de configuração JSON para ler as configurações. Ele as lê na seguinte ordem:
+   appsettings.json
+   appsettings.<EnvironmentName>.json
+
+Por exemplo, se o ambiente atual for Desenvolvimento, então o appsettings.development.json é carregado. Se o ambiente for Produção, então ele usa oappsettings.production.json
+Portanto, podemos carregar diferentes configurações com base no ambiente ou aplicativo em execução.
+
 # Extra Notes:
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
@@ -2474,15 +2527,3 @@ endpoints.MapGet("/", async context =>
 - Thread-Safe: Capacidade de um método ou classe de ser usado simultaneamente por múltiplas threads sem causar corrupção de dados ou resultados imprevisíveis.
   Classe Random: Não é thread-safe, o que significa que o uso simultâneo por múltiplas threads pode levar a problemas de concorrência.
   Soluções: Usar bloqueios (lock) ou ThreadLocal<Random> para garantir segurança em contextos multi-thread.
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
