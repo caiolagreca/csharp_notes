@@ -1095,6 +1095,139 @@ Serviços com menor tempo de vida injetados em serviços com maior tempo de vida
 Sendo assim, Nunca injete Scoped e Transient services no Singleton service.
 Nunca injete Transient services no Scoped service.
 
+# Authentication:
+
+Autenticação é o processo de verificar a identidade de um indivíduo. É sobre determinar quem é o usuário.
+.NET utiliza claims-based authentication.
+
+1. Existem muitas maneiras de lidar com a autenticação em web apps:
+   Cookie-Based authentication
+   Token-Based authentication
+   Third-party access(OAuth, API-token)
+   OpenId
+   SAML
+
+Utilizamos o Authentication Scheme e Authentication Handlers para saber qual das opcoes utilizar para preencher o User Property.
+
+2. Authentication Handlers:
+   .NET usa o Authentication Handlers para lidar com a autenticação.
+   Registramos ele usando o metodo de extensão AddAuthentication.
+   Deve implementar a interface IAuthenticationHandler, na qual consiste em três métodos - AuthenticateAsync(), ChallengeAsync(), &ForbidAsync()
+   Responsavel por:
+   Autenticar um usuário usando o método AuthenticateAsync()
+   Se o usuário não estiver autenticado, redireciona o usuário para a página de login usando o metodo ChallengeAsync()
+   Se o usuário estiver autenticado, mas não autorizado, proibe a solicitação atual usando o metodo ForbidAsync()
+
+   - O método AuthenticateAsync() do Authentication Handler é responsável por construir o ClaimsPrincipal do Request e retorná-lo ao Authentication Middleware. O Authentication middleware então define o HttpContext.User property com o ClaimsPrincipal.
+
+   - Por exemplo, o metodo AuthenticateAsync() do cookie authentication handler deve ler os cookies da solicitação atual, construir o ClaimsPrincipal e retorná-lo. Similarmente, o JWT bearer handler deve desserializar e validar o JWT bearer token, construir o ClaimsPrincipal e retorná-lo.
+
+3. Authentication Scheme:
+   Cada Authentication Handler que registramos usando o metodo AddAuthentication() torna-se um Authentication Scheme.
+   Consiste em:
+   Um Nome unico, no qual identifica o Authentication Scheme
+   Um Authentication Handler
+   Opções para configurar a instancia especifica do Handler (ver exemplo)
+
+```csharp
+//Adicionando Cookie Authentication & JwtBearer Authentication handler no program.cs
+builder.Services.AddAuthentication().AddJwtBearer().AddCookie();
+//No exemplo, registramos 2 Authentication Schemes porem nao demos nenhum nome nem configuramos nenhuma de suas opções.
+//Cada um desses Authentication Handlers vem com suas definições por padrão.
+
+//O nome padrao para o Cookie Authentication é "Cookies" e para JWTBearer Authentication é "Bearer":
+builder.Services.AddAuthentication().AddJwtBearer("Bearer").AddCookie("Cookies");
+
+//Também é possível definir um específico Handler mais de uma vez. No exemplo abaixo definimoso Cookie Authentication 2 vezes com nomes diferentes.
+//Com isso, temos 3 Authentication schemes:
+builder.Services.AddAuthentication().AddJwtBearer("Bearer").AddCookie("Cookies").AddCookie("Cookies2");
+
+//Quando usamos mais de um Authentication Scheme, precisamos configurar um deles como a autenticação padrão. Fazemos isso passando o nome do Authentication Scheme como o primeiro argumento do metodo AddAuthentication:
+builder.Services.AddAuthentication("Cookies2").AddJwtBearer("Bearer").AddCookie("Cookies").AddCookie("Cookies2");
+//No exemplo acima o Cookies2 torna-se o Authentication scheme padrão.
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddJwtBearer("Bearer").AddCookie("Cookies").AddCookie("Cookies2");
+//No exemplo acima o Cookies torna-se o Authentication scheme padrão.
+```
+
+4. Authentication Handler Options:
+   Cada Authentication handler vem com opções, no qual voce pode configurar para ajustar o Authentication handler:
+
+```csharp
+//Configurando o Cookie Authentication Handler
+services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie("Cookies", options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ReturnUrlParameter = "ReturnUrl";
+    });
+
+//Configurando o JWT bearer Authentication Handler
+services.AddAuthentication(x =>
+    .AddJwtBearer(x =>
+    {
+        x.RequireHttpsMetadata = true;
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtTokenConfig.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtTokenConfig.Audience,
+            ValidateIssuerSigningKey = true,
+            RequireExpirationTime = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtTokenConfig.Secret))
+        };
+    }));
+```
+
+5. Authentication Middleware:
+   UseAuthentication() registra o Authentication Middleware
+   O principal objetivo do Authentication Middleware é atualizar o HttpContext.User Property com o ClaimsPrincipal.
+   Para fazer isso ele usa o Authentication Handler padrão e invoca o metodo AuthenticationAsync(). Esse metodo retornará o ClaimsPrincipal.
+   Inserimos o Authentication Middleware depois do Endpoint Routing. Sendo asim, ele saberá qual Controller Action Method está lidando com a request.
+   Dever vir antes do Authorization Middleware (UseAuthorization()) e EndPoint Middleware (UseEndPoints()).
+   Todos os middlewares que aparecem depois do UseAuthentication() no pipeline de middleware podem verificar se o usuário está autenticado inspecionando a propriedade HttpContext.User
+
+# Authorization:
+
+A autorização determina o que o usuário tem permissão para fazer.
+ExemploL: quando um usuário está logado, ele é autenticado. Mas ele pode não ter autoridade para navegar na Área de Administração. Somente os usuários com Direitos de Administração (ou Claims) podem acessar a Área de Administração. No entanto, antes de determinar o que o usuário pode fazer, você precisa saber quem é o usuário. Portanto, a autenticação vem primeiro, antes da autorização.
+
+# Como funciona a autenticação e autorização:
+
+1. Unauthenticated Request: Quando chega uma solicitação de um usuário não autenticado para uma página protegida.
+   A solicitação chega ao Middleware de autenticação.
+   O Authentication Middleware verifica se uma credencial adequada está presente na request. Ele usará o default authentication handler para fazer isso. Pode ser um Cookies handler/Jwt handler. Como ele não encontra nenhuma credencial, ele definirá a Propriedade do Usuário para um usuário anônimo.
+   O Middleware de Autorização (UseAuthorization()) verifica se a página de destino precisa de autorização.
+   Se não, o usuário tem permissão para visitar a página.
+   Se sim, ele invoca o ChallengeAsync() no Authentication Handler. Ele redireciona o usuário para a página de login.
+
+2. Signing In:
+   O usuário apresenta o ID e a senha no Login Form e clica no botão Login
+   A solicitação chega ao sign-in endpoint após passar pelos Middlewares de Autenticação e Autorização. Portanto, o sign-in endpoint deve ter Allowanonymous decorator, caso contrário, a solicitação nunca o alcançará.
+   O ID e a senha do usuário são validados no banco de dados
+   Se o Cookie Authentication handler for usado:
+   Cria um ClaimsPrincipal do usuário com o Claims do Usuário
+   Usa o HttpContext.SignInAsync para criar um cookie criptografado e adicioná-lo à resposta atual.
+   A resposta é retornada ao navegador
+   O navegador armazena o cookie
+   Se o JWT Bearer Authentication handler for usado:
+   Cria um Token JWT do usuário com as Claims do Usuário
+   O token JWT é enviado ao usuário como uma resposta
+   Os usuários leem o token e o armazenam no Local Storage, Session Storage, ou até mesmo em Cookies
+   O usuário agora está autenticado
+
+3. Authenticating the Subsequent Requests:
+   O usuário faz uma solicitação para proteger a página.
+   Se você estiver usando autenticação de cookie, então não precisa fazer nada. O navegador incluirá automaticamente o cookie com cada solicitação. Mas no caso do token JWT, você precisa incluir o token no Authorization header.
+   A solicitação atinge o Middleware de autenticação. Ele usará o default Authenticate handler para ler o cookie/Token JWT e construir ClaimsIdentity e atualizar a propriedade HttpContext.User com ele.
+   O Middleware de Autorização verifica se o usuário está autenticado inspecionando a propriedade HttpContext.User e permite acesso a ela.
+
 # Como JWT Tokens funcionam:
 
 1. O cliente solicita acesso a aplicacao usando suas credenciais (geralmente username e password).
@@ -1131,6 +1264,10 @@ Por exemplo, pegue sua carteira de motorista. Ela tem claims como FirstName, Las
 ClaimsPrincipal: contém uma coleção de ClaimsIdentity . Você pode pensar no ClaimsPrincipal como o usuário do seu aplicativo.
 Um Usuário pode ter mais de uma ClaimsIdentity. Por exemplo, carteira de motorista e passaporte.
 Uma carteira de motorista é uma ClaimsIdentity com afirmações como FirstName, LastName, DateOfBirth, etc. Passaporte é outra ClaimsIdentity com afirmações como FirstName, LastName, Address, PassportNo, etc.
+
+Lemos a ClaimsPrincipal no User Property do HttpContext object.
+Toda request que recebemos vai conter um HttpContext object. Esse objeto contem a informacao a respeito da requisicao HTTP atual.
+É o Authentication Middleware que preenche o User Property. Lembre-se de que registramos o Authentication Middleware no pipeline do Middleware usando o metodo UseAuthentication()
 
 # O que é Razor Pages:
 
