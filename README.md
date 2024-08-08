@@ -1269,6 +1269,50 @@ Lemos a ClaimsPrincipal no User Property do HttpContext object.
 Toda request que recebemos vai conter um HttpContext object. Esse objeto contem a informacao a respeito da requisicao HTTP atual.
 É o Authentication Middleware que preenche o User Property. Lembre-se de que registramos o Authentication Middleware no pipeline do Middleware usando o metodo UseAuthentication()
 
+# Identity:
+
+é um sistema de associação com todos os recursos para criar e manter user logins. Usando a Identity API, você pode fazer login e logout de usuários, redefinir suas senhas, bloquear usuários e implementar Multi-Factor Authentication.
+Ele também pode se integrar com provedores de login externos, como Microsoft Account, Facebook, Google, etc.
+Identity API usa Cookie Authentication.
+Contém muitas classes auxiliares, que escondem as complexidades de gerenciar os usuários. Ela tem classes para registrar usuários, autenticá-los validando suas senhas, gerenciar roles e claims etc. Ela também contém o formulário de login, formulário de registro, formulários de redefinição de senha, etc.
+
+- O que é possível fazer com Identity:
+  Database schema para armazenar usuários, claims & Roles
+  UI para efetuar login, criar e gerenciar usuários
+  Criar/Modificar/Excluir Usuário
+  Criar/Modificar/Excluir User Claims
+  Validação de senha e regras.
+  Password Hashing
+  Bloqueio de conta de usuário
+  Gera password-reset tokens.
+  Multi Factor Authentication
+  Gerencia Identity providers externos (por exemplo, Facebook, Google, Twitter).
+
+Identity consiste em 2 principais categorias: Managers e Stores.
+
+- Managers:
+  Gerenciam os dados relacionados à identity, como criar um usuário, adicionar Roles, etc.
+  Eles têm classes como UserManager, RoleManager, SignInManager, etc.
+
+  Usermanage - Contém os métodos para criar, excluir e atualizar os usuários. Ele usa os Stores para persistir os dados no banco de dados.
+
+  SignInManager - Responsavel pelo Login e Logout do usuario na aplicação. Contem metodos como SignInAsync, SignOutAsync etc. No Sign In, ele cria um novo ClaimsPrincipal a partir dos dados do usuário. Ele define a propriedade HttpContext.User para o novo ClaimsPrincipal. Então ele serializa o ClaimsPrincipal, criptografa e armazena como um cookie. O servidor envia um cookie para o navegador com a resposta. O navegador o retorna de volta para o servidor em cada solicitação.
+
+- Stores:
+  Persistem os Users, Roles, etc, no data source.
+  Identity API usa o Entity Framework Core para armazenar as informações do usuário no SQL Server Database. Mas você pode alterá-lo para usar um banco de dados ou ORM diferente.
+  O Identity system desacopla os Stores e Managers uns dos outros. Portanto, podemos facilmente alterar os provedores de banco de dados sem interromper toda a aplicação.
+
+Ao criar um DB com Identity, as seguintes tabelas sao criadas:
+ENTIDADE - NOME DA TABELA - DESCRIÇÃO
+IdentityUser - AspNetUsers - Tabela primária para armazenar informações do usuário
+IdentityUserClaim - AspNetUserClaims - tabela contém as Claims associadas ao usuário.
+IdentityUserLogin - AspNetUserLogins - a tabela contém informações sobre logins externos/3rd party.
+IdentityUserToken - AspNetUserTokens - serve para armazenar tokens recebidos de provedores de login externos.
+IdentityUserRole - AspNetUserRoles - tabela contém os Roles atribuídos ao usuário
+IdentityRole - AspNetRoles - tabelas para armazenar os Roles.
+IdentityRoleClaim - AspNetRoleClaims - As Claims que são atribuídas ao Role.
+
 # O que é Razor Pages:
 
 Razor Pages é um recurso do ASP.NET Core projetado para simplificar a construção de aplicações web. Cada página Razor é autossuficiente, combinando a lógica de UI e a apresentação em uma estrutura organizada. As principais vantagens incluem simplicidade, melhor organização do código e desempenho aprimorado em cenários simples. É ideal para aplicações simples a moderadas, prototipagem rápida e CRUDs. Contudo, pode ser menos adequado para aplicações altamente complexas devido à sua estrutura mais direta e menos flexível em comparação com MVC.
