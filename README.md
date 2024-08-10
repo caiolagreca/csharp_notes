@@ -1119,6 +1119,8 @@ Utilizamos o Authentication Scheme e Authentication Handlers para saber qual das
    Se o usuário estiver autenticado, mas não autorizado, proibe a solicitação atual usando o metodo ForbidAsync()
 
    - O método AuthenticateAsync() do Authentication Handler é responsável por construir o ClaimsPrincipal do Request e retorná-lo ao Authentication Middleware. O Authentication middleware então define o HttpContext.User property com o ClaimsPrincipal.
+   User property nada mais é do que uma instância de ClaimsPrincipal. Ela é automaticamente injetada no Controller ou Razor Pages.
+
 
    - Por exemplo, o metodo AuthenticateAsync() do cookie authentication handler deve ler os cookies da solicitação atual, construir o ClaimsPrincipal e retorná-lo. Similarmente, o JWT bearer handler deve desserializar e validar o JWT bearer token, construir o ClaimsPrincipal e retorná-lo.
 
@@ -1189,7 +1191,7 @@ services.AddAuthentication(x =>
    UseAuthentication() registra o Authentication Middleware
    O principal objetivo do Authentication Middleware é atualizar o HttpContext.User Property com o ClaimsPrincipal.
    Para fazer isso ele usa o Authentication Handler padrão e invoca o metodo AuthenticationAsync(). Esse metodo retornará o ClaimsPrincipal.
-   Inserimos o Authentication Middleware depois do Endpoint Routing. Sendo asim, ele saberá qual Controller Action Method está lidando com a request.
+   Inserimos o Authentication Middleware depois do Endpoint Routing (UseRouting()). Sendo asim, ele saberá qual Controller Action Method está lidando com a request.
    Dever vir antes do Authorization Middleware (UseAuthorization()) e EndPoint Middleware (UseEndPoints()).
    Todos os middlewares que aparecem depois do UseAuthentication() no pipeline de middleware podem verificar se o usuário está autenticado inspecionando a propriedade HttpContext.User
 
@@ -1271,7 +1273,7 @@ Toda request que recebemos vai conter um HttpContext object. Esse objeto contem 
 
 # Identity:
 
-é um sistema de associação com todos os recursos para criar e manter user logins. Usando a Identity API, você pode fazer login e logout de usuários, redefinir suas senhas, bloquear usuários e implementar Multi-Factor Authentication.
+é um sistema de associação com todos os recursos para criar e manter login do usuario. Usando a Identity API, você pode fazer login e logout de usuários, redefinir suas senhas, bloquear usuários e implementar Multi-Factor Authentication.
 Ele também pode se integrar com provedores de login externos, como Microsoft Account, Facebook, Google, etc.
 Identity API usa Cookie Authentication.
 Contém muitas classes auxiliares, que escondem as complexidades de gerenciar os usuários. Ela tem classes para registrar usuários, autenticá-los validando suas senhas, gerenciar roles e claims etc. Ela também contém o formulário de login, formulário de registro, formulários de redefinição de senha, etc.
@@ -1294,9 +1296,9 @@ Identity consiste em 2 principais categorias: Managers e Stores.
   Gerenciam os dados relacionados à identity, como criar um usuário, adicionar Roles, etc.
   Eles têm classes como UserManager, RoleManager, SignInManager, etc.
 
-  Usermanage - Contém os métodos para criar, excluir e atualizar os usuários. Ele usa os Stores para persistir os dados no banco de dados.
+  UserManager - É uma classe concreta que gerencia o User. Essa classe contém métodos para criar, excluir e atualizar os usuários. Tambem possui metodos para encontrar o User pelo User Id, User Name e Email. Alem disso, possui a funcionalidade de adicionar e remover Claims, adicionar e remover Roles, gerar password hash, validacao do Usuario, etc. Ele usa os Stores para persistir os dados no banco de dados.
 
-  SignInManager - Responsavel pelo Login e Logout do usuario na aplicação. Contem metodos como SignInAsync, SignOutAsync etc. No Sign In, ele cria um novo ClaimsPrincipal a partir dos dados do usuário. Ele define a propriedade HttpContext.User para o novo ClaimsPrincipal. Então ele serializa o ClaimsPrincipal, criptografa e armazena como um cookie. O servidor envia um cookie para o navegador com a resposta. O navegador o retorna de volta para o servidor em cada solicitação.
+  SignInManager - Classe concreta responsavel por autenticar o usuario, ou seja, pelo Login e Logout do usuario na aplicação. Contem metodos como SignInAsync, SignOutAsync etc. No Sign In, ele cria um novo ClaimsPrincipal a partir dos dados do usuário. Ele define a propriedade HttpContext.User para o novo ClaimsPrincipal. Então ele serializa o ClaimsPrincipal, criptografa e armazena como um cookie. O servidor envia um cookie para o navegador com a resposta. O navegador o retorna de volta para o servidor em cada solicitação.
 
 - Stores:
   Persistem os Users, Roles, etc, no data source.
@@ -2708,3 +2710,5 @@ Portanto, podemos carregar diferentes configurações com base no ambiente ou ap
 - Thread-Safe: Capacidade de um método ou classe de ser usado simultaneamente por múltiplas threads sem causar corrupção de dados ou resultados imprevisíveis.
   Classe Random: Não é thread-safe, o que significa que o uso simultâneo por múltiplas threads pode levar a problemas de concorrência.
   Soluções: Usar bloqueios (lock) ou ThreadLocal<Random> para garantir segurança em contextos multi-thread.
+
+- Para inserir um arquivo .gitignore no Visual Studio, basta inserir o comando no terminal "dotnet new gitignore" (atencao para saber se o terminal esta no root do projeto)
