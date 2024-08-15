@@ -1119,8 +1119,7 @@ Utilizamos o Authentication Scheme e Authentication Handlers para saber qual das
    Se o usuário estiver autenticado, mas não autorizado, proibe a solicitação atual usando o metodo ForbidAsync()
 
    - O método AuthenticateAsync() do Authentication Handler é responsável por construir o ClaimsPrincipal do Request e retorná-lo ao Authentication Middleware. O Authentication middleware então define o HttpContext.User property com o ClaimsPrincipal.
-   User property nada mais é do que uma instância de ClaimsPrincipal. Ela é automaticamente injetada no Controller ou Razor Pages.
-
+     User property nada mais é do que uma instância de ClaimsPrincipal. Ela é automaticamente injetada no Controller ou Razor Pages.
 
    - Por exemplo, o metodo AuthenticateAsync() do cookie authentication handler deve ler os cookies da solicitação atual, construir o ClaimsPrincipal e retorná-lo. Similarmente, o JWT bearer handler deve desserializar e validar o JWT bearer token, construir o ClaimsPrincipal e retorná-lo.
 
@@ -1233,11 +1232,84 @@ ExemploL: quando um usuário está logado, ele é autenticado. Mas ele pode não
 # Como JWT Tokens funcionam:
 
 1. O cliente solicita acesso a aplicacao usando suas credenciais (geralmente username e password).
-2. O servidor verifica se as credenciais do cliente sao válidas; caso seja, o servidor envia ao cliente um Token que serve para permitir acesso a endpoints que so podem ser acessados com a devida autenticacao e autorizacao.
+2. O servidor verifica se as credenciais do cliente sao válidas; caso seja, o servidor envia ao cliente um Token que serve para permitir acesso a endpoints que so podem ser acessados com a devida autenticacao e autorizacao. (O token contem a Claims do usuario como chave-valor no formato JSON. O emissor assina digitalmente o token usando uma chave privada antes de emitir para o usuario).
 3. Agora, o cliente ja acessou a aplicacao com suas credenciais e obteve o Token atraves do servidor. Assim, o cliente irá acessar o endpoint que deseja (seja pelo metodo GET, POST, PUT, DELETE...)
 4. Porém, algum desses endpoints são restritos. Exemplo: so pode ser acessado após efetuar o login, ou mesmo após login só pode ser acessado por usuarios com privilegios (como deletar contas de usuarios que somente admin users podem realizar).
 5. Entao, para ter acesso e obter a resposta desses endpoints restritos, o cliente realiza uma requisicao HTTP/HTTPS do endpoint desejado e juntamente envia o Token obtido atraves do cabeçalho na requisicao.
 6. O servidor verifica se o Token eh valido e se ainda nao foi expirado, e caso seja, retorna a resposta da requisicao para o cliente, finalizando com sucesso a requisicao solicitada pelo cliente.
+
+- JSON Web Token (JWT ou Access Token):
+
+  Consiste em 3 partes (Header, Payload e Signature).
+  O Header contém informações sobre o algoritmo que o emissor usa para gerar o Token (O emissor é a API Web do .NET):
+
+  ```csharp
+  {
+  “alg”: “HS256”,
+  “typ”: “JWT”
+  }
+  ```
+
+  O Payload contem os Claims do usuario:
+
+  ```csharp
+  {
+   “sub”: “1234567890”,
+  “name”: “John Doe”,
+  “iat”: 1516239022,
+  "role": "Admin",
+  "userdefined":"Whatever"
+  }
+  //O "sub" (subject), "iat" (issued at) sao Claims predefinidos. Há outros Claims predefinidos como "iss" (issuer), "aud" (audience), "exp" (expiration time), "nbf" (not before), "jti" (JWT ID). Alguns desses Claims são importantes para segurança.
+  //Podemos adicionar quantos Public Claims quisermos. "role, "name" e "userdefined" sao os Public Claims do exemplo.
+  ```
+
+  O Token fica no formato header.payload.signature:
+
+  ```csharp
+  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdEBnbWFpbC5jb20iLCJuYmYiOjE2MTgxMzg0NTQsImV4cCI6MTYxODEzODc1NCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIn0.aS1RfKFxwrxqaCdiPBJfTT1qjdA2tzFvA69nifTjQoM
+  ```
+
+  Qualquer um pode decofificar e ler um token JWT, portanto não armazene dados sensíveis em um Token.
+  Mas ninguém poderá adulterar o token, pois ele é assinado com um segredo.
+  O emissor não armazena o token. O armazenamento seguro do token é de responsabilidade do Usuário do token.
+
+- JWT Validation:
+  Além de codificar e assinar o token, o JWT tem algumas outras propriedades relacionadas à segurança na forma de claims predefinidas.
+
+  1. exp claim:
+     exp significa a data de expiração de um token JWT.
+     O token é inválido se a data de expiração estiver no Passado.
+     Sem uma data de expiração, o token é válido até o fim dos tempos.
+     Sem uma data de expiração, a única maneira de invalidar o token é alterando o segredo.
+     Alterar o segredo invalidará todos os tokens. Portanto, é importante definir a data de expiração corretamente e o mais curta possível.
+
+  2. iat claim:
+     iat claim (issued at) indica o horário em que o JWT foi emitido.
+     Isso também pode ser usado para rejeitar o token se ele não for novo.
+
+  3. nbf claim:
+     nbf significa not before.
+     Ele contém o timestamp e indica que o token é válido somente após esse tempo.
+
+  4. iss claim:
+     iss claim(issuer) é um valor de string que indica a identidade do emissor que emitiu o token.
+
+  5. aud claim:
+     O aud claim representa o público alvo. É um valor de string e indica o usuário pretendido do token.
+
+- Refresh Token:
+  Os tokens JWT vem com uma data de expiração (exp claim). Sem uma data de expiração os tokens são validos por um longo tempo.
+  O servidor confiará em um token enquanto sua assinatura for válida e o token nao estiver expirado.
+  Se um hacker obtiver o token e alterar a senha do usuario, o token ainda será válido.
+  A unica maneira de invalidar um token é alterando o segredo, o que invalidará todos os tokens.
+  Sendo assim, é necessário definir uma data de expiração mais curta, porém será incoveniente para o usuario ter que refazer o login toda vez.
+  É aqui que o Refresh Token entra em cena:
+  O emissor emite o refresh token junto com o access token, porém, diferentemente do access token, o emissor armazena o refresh token e de maneira segura.
+  O refresh token também expira, porém com uma duração maior que o access token.
+  Após o access token expirar, o usuario envia o refresh token ao emissor, no qual irá validar o refresh token e emitir um novo access token junto com um novo refresh token.
+  O refresh token antigo também é excluido para que o usuário não possa reutilizá-lo.
+  Tudo isso acontece sem o usuário saber.
 
 # O que sao Claims:
 
