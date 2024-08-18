@@ -1112,7 +1112,7 @@ Utilizamos o Authentication Scheme e Authentication Handlers para saber qual das
 2. Authentication Handlers:
    .NET usa o Authentication Handlers para lidar com a autenticação.
    Registramos ele usando o metodo de extensão AddAuthentication.
-   Deve implementar a interface IAuthenticationHandler, na qual consiste em três métodos - AuthenticateAsync(), ChallengeAsync(), &ForbidAsync()
+   Deve implementar a interface IAuthenticationHandler, na qual consiste em três métodos - AuthenticateAsync(), ChallengeAsync() and ForbidAsync()
    Responsavel por:
    Autenticar um usuário usando o método AuthenticateAsync()
    Se o usuário não estiver autenticado, redireciona o usuário para a página de login usando o metodo ChallengeAsync()
@@ -1139,7 +1139,7 @@ builder.Services.AddAuthentication().AddJwtBearer().AddCookie();
 //O nome padrao para o Cookie Authentication é "Cookies" e para JWTBearer Authentication é "Bearer":
 builder.Services.AddAuthentication().AddJwtBearer("Bearer").AddCookie("Cookies");
 
-//Também é possível definir um específico Handler mais de uma vez. No exemplo abaixo definimoso Cookie Authentication 2 vezes com nomes diferentes.
+//Também é possível definir um específico Handler mais de uma vez. No exemplo abaixo definimos o Cookie Authentication 2 vezes com nomes diferentes.
 //Com isso, temos 3 Authentication schemes:
 builder.Services.AddAuthentication().AddJwtBearer("Bearer").AddCookie("Cookies").AddCookie("Cookies2");
 
@@ -1190,14 +1190,102 @@ services.AddAuthentication(x =>
    UseAuthentication() registra o Authentication Middleware
    O principal objetivo do Authentication Middleware é atualizar o HttpContext.User Property com o ClaimsPrincipal.
    Para fazer isso ele usa o Authentication Handler padrão e invoca o metodo AuthenticationAsync(). Esse metodo retornará o ClaimsPrincipal.
-   Inserimos o Authentication Middleware depois do Endpoint Routing (UseRouting()). Sendo asim, ele saberá qual Controller Action Method está lidando com a request.
+   Inserimos o Authentication Middleware depois do Endpoint Roufting (UseRouting()). Sendo asim, ele saberá qual Controller Action Method está lidando com a request.
    Dever vir antes do Authorization Middleware (UseAuthorization()) e EndPoint Middleware (UseEndPoints()).
    Todos os middlewares que aparecem depois do UseAuthentication() no pipeline de middleware podem verificar se o usuário está autenticado inspecionando a propriedade HttpContext.User
 
 # Authorization:
 
-A autorização determina o que o usuário tem permissão para fazer.
-ExemploL: quando um usuário está logado, ele é autenticado. Mas ele pode não ter autoridade para navegar na Área de Administração. Somente os usuários com Direitos de Administração (ou Claims) podem acessar a Área de Administração. No entanto, antes de determinar o que o usuário pode fazer, você precisa saber quem é o usuário. Portanto, a autenticação vem primeiro, antes da autorização.
+A autorização determina o que o usuário tem permissão para fazer. Ex: Acessar uma rota especifica, um Controller, Controller Action, Resource, etc.
+Exemplo: quando um usuário está logado, ele é autenticado. Mas ele pode não ter autoridade para navegar na Área de Administração. Somente os usuários com Direitos de Administração (ou Claims) podem acessar a Área de Administração. No entanto, antes de determinar o que o usuário pode fazer, você precisa saber quem é o usuário. Portanto, a autenticação vem primeiro, antes da autorização.
+Sendo assim, o Authentication Middleware atualiza o HttpContext.User Property com a informação sobre o usuario (ClaimPrincipal). O ClaimPrincipal contem o Claims do User. Entao, o Authorization Middleware lê o ClaimPrincipal do HttpContext.User e o utiliza para checar se o usuario esta autorizado ou não.
+
+Existem diversas estratégias para construir um sistema de autorização robusto:
+
+1. Declarative Authorization:
+   Usamos o atributo [Authorize] para proteger a página.
+   Ele descreve como a pagina deve ser protegida e o Authorization Middleware vai ler o atributo e descobrirá como proteger a pagina.
+   Configuramos a autorização declaritva das seguintes maneiras:
+
+   - Simple Authorization:
+     Aplicamos o atributo [Authorize] a um Controller, Action ou Razor Page. Isso impedirá usuarios nao autenticados acessarem a pagina.
+
+   ```csharp
+   [Authorize]
+   public class HomeController: Controller
+   {
+    public ActionResult Login(){}
+    public ActionResult Logout(){}
+   }
+   ```
+
+   - Claim Based Authorization:
+     Controi-se uma Authorization Policy e a mapeamos para um Claim no Program.cs
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+      options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Admin"));
+     });
+     ```
+
+     Aplicamos a Policy ao Controller, Action ou Razor Page usando o atributo [Authorize]. Isso irá impedir usuarios nao autenticados e usuarios autenticados mas sem o Admin Claim.
+
+     ```csharp
+     [Authorize(Policy = "AdminOnly")]
+     public class AdminController: Controller
+     {
+      public ActionResult Login(){}
+      public ActionResult Logout(){}
+     }
+     ```
+
+     Note que o Claims nao pode ser usado diretamente no atributo [Authorize]. Precisamos construir uma Policy para usa-lo.
+
+   - Role based Authorization:
+     Similar ao Claim based porem utiliza o Roles ao invés do Claims.
+     Aqui voce pode usar o Roles diretamente no atributo [Authorize], sem precisar construi a Policy no Program.cs
+
+     ```csharp
+     [Authorize(Roles = "Admin")]
+     public class AdminController: Controller
+     {
+     }
+     ```
+
+     Voce tambem pode criar a Policy usando o RequireRole no Program.cs e usar a Policy ao invés do Roles no Controller.
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+      options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+     });
+     ```
+
+     ```csharp
+     [Authorize(Policy = "Admin")]
+     public class AdminController: Controller
+     {
+     }
+     ```
+
+     Role based Authorization existe por conta de compatibilidade com versões antigas, porém é melhor evitar usá-lo visto que pode ser descontinuado.
+
+   - Policy based Authorization:
+     Role based e Claim based Authorization usam a Policy nos bastidores. Mas se possuirmos uma situação complexa, precisaremos construir uma Policy based Authorization Scheme personalizado.
+     Os blocos de construção da Policy Authorization são Policy (pode conter mais de um requirement), Requirement (define o Authorization Requirement) e Requirement Handler (contem a logica que checa o requirement e um requirement pode ter mais de um Handler).
+
+2. Imperative Authorization: Resource-based authorization usando Policy
+   O Authorization Middleware, no qual usa o atributo [Authorize] para checar as permissões, roda-o muito antes da execução da página ou do Action Method. Sendo assim, ele não tem acesso as informações ou recursos no qual a pagina ou Action Method opera.
+   Exemplo: Em um documento que possui um Autor, somente esse autor pode edita-lo. Para implementar essa segurança, precisamos recuperar o documento do servidor, checar quem é o autor e então decidir se permite editar o documento ou não. Usando a Declarative Authorization anterior, com atributo [Authorize], não conseguimos lidar com essa situação.
+   Sendo assim, escrevemos o codigo para validar o usuario direto no método, injetando o Authorization Service no Controller/Page. Então usamos o método AuthorizationAsync para disparar manualmente uma autorização.
+
+   - Como funciona:
+     O UseRouting() resolve as solicitações HTTP recebidas e constroi um Endpoint
+     O Authentication Middleware constroi o ClaimsPrincipal baseado nos Cookies ou JWT Token e atualiza o HttpContext.User
+     A solicitação chega ao Authorization Middleware, no qual verifica se deve permitir acesso a URL para o usuario
+     Se a autorização for bem sucedida, a solicitação prossegue normalmente para o Endpoint Middleware e é concluida
+     Caso a autorização falhe, o Middleware retorna um erro
+     Se o usuario nao estiver autenticado, o Authorization Middleware invoca o ChallengeResult no Authentication Handler (em aplicações web, o Handler irá redirecionar o usuario para a pagina de login. Em uma API, irá retornar um erro 401 Unauthorized)
+     Se o usuario estiver autenticado mas nao autorizado, o Authorization Middleware invoca o ForbidenResult no Authentication Handler (em aplicações web, o Handler irá redirecionar o usuario para uma pagina de Acesso negado. Em uma API, irá retornar um erro 403 Forbidden)
 
 # Como funciona a autenticação e autorização:
 
@@ -1240,39 +1328,39 @@ ExemploL: quando um usuário está logado, ele é autenticado. Mas ele pode não
 
 - JSON Web Token (JWT ou Access Token):
 
-  Consiste em 3 partes (Header, Payload e Signature).
-  O Header contém informações sobre o algoritmo que o emissor usa para gerar o Token (O emissor é a API Web do .NET):
+Consiste em 3 partes (Header, Payload e Signature).
+O Header contém informações sobre o algoritmo que o emissor usa para gerar o Token (O emissor é a API Web do .NET):
 
-  ```csharp
-  {
-  “alg”: “HS256”,
-  “typ”: “JWT”
-  }
-  ```
+```csharp
+{
+“alg”: “HS256”,
+“typ”: “JWT”
+}
+```
 
-  O Payload contem os Claims do usuario:
+O Payload contem os Claims do usuario:
 
-  ```csharp
-  {
-   “sub”: “1234567890”,
-  “name”: “John Doe”,
-  “iat”: 1516239022,
-  "role": "Admin",
-  "userdefined":"Whatever"
-  }
-  //O "sub" (subject), "iat" (issued at) sao Claims predefinidos. Há outros Claims predefinidos como "iss" (issuer), "aud" (audience), "exp" (expiration time), "nbf" (not before), "jti" (JWT ID). Alguns desses Claims são importantes para segurança.
-  //Podemos adicionar quantos Public Claims quisermos. "role, "name" e "userdefined" sao os Public Claims do exemplo.
-  ```
+```csharp
+{
+ “sub”: “1234567890”,
+“name”: “John Doe”,
+“iat”: 1516239022,
+"role": "Admin",
+"userdefined":"Whatever"
+}
+//O "sub" (subject), "iat" (issued at) sao Claims predefinidos. Há outros Claims predefinidos como "iss" (issuer), "aud" (audience), "exp" (expiration time), "nbf" (not before), "jti" (JWT ID). Alguns desses Claims são importantes para segurança.
+//Podemos adicionar quantos Public Claims quisermos. "role, "name" e "userdefined" sao os Public Claims do exemplo.
+```
 
-  O Token fica no formato header.payload.signature:
+O Token fica no formato header.payload.signature:
 
-  ```csharp
-  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdEBnbWFpbC5jb20iLCJuYmYiOjE2MTgxMzg0NTQsImV4cCI6MTYxODEzODc1NCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIn0.aS1RfKFxwrxqaCdiPBJfTT1qjdA2tzFvA69nifTjQoM
-  ```
+```csharp
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidGVzdEBnbWFpbC5jb20iLCJuYmYiOjE2MTgxMzg0NTQsImV4cCI6MTYxODEzODc1NCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzMTQvIn0.aS1RfKFxwrxqaCdiPBJfTT1qjdA2tzFvA69nifTjQoM
+```
 
-  Qualquer um pode decofificar e ler um token JWT, portanto não armazene dados sensíveis em um Token.
-  Mas ninguém poderá adulterar o token, pois ele é assinado com um segredo.
-  O emissor não armazena o token. O armazenamento seguro do token é de responsabilidade do Usuário do token.
+Qualquer um pode decofificar e ler um token JWT, portanto não armazene dados sensíveis em um Token.
+Mas ninguém poderá adulterar o token, pois ele é assinado com um segredo.
+O emissor não armazena o token. O armazenamento seguro do token é de responsabilidade do Usuário do token.
 
 - JWT Validation:
   Além de codificar e assinar o token, o JWT tem algumas outras propriedades relacionadas à segurança na forma de claims predefinidas.
@@ -2784,3 +2872,37 @@ Portanto, podemos carregar diferentes configurações com base no ambiente ou ap
   Soluções: Usar bloqueios (lock) ou ThreadLocal<Random> para garantir segurança em contextos multi-thread.
 
 - Para inserir um arquivo .gitignore no Visual Studio, basta inserir o comando no terminal "dotnet new gitignore" (atencao para saber se o terminal esta no root do projeto)
+
+- using sendGrid to send emails to user:
+
+```csharp
+dotnet add package SendGrid --version 9.28.1
+```
+
+- Adding and updating migration:
+
+```csharp
+dotnet ef migrations add InitialCreate --output-dir Data\Migrations
+dotnet ef database update
+```
+
+- Resolvendo bug do database:
+  Criei campos dinamicos para um banco de dados ja existente. Ao tentar atualizar o banco de dados, essas novas colunas (campos) nao estavam sendo inseridos na tabela.
+
+  Resolucao do bug:
+
+1. Resetar o DB: Quando você pode perder os dados existentes e deseja sincronizar completamente as migrações com o banco de dados.
+
+```csharp
+dotnet ef database drop --force
+dotnet ef migrations add InitialCreate --output-dir Data/Migrations
+dotnet ef database update
+```
+
+2. Ajustar Migrações Sem Excluir o Banco de Dados: Quando você precisa preservar os dados existentes no banco de dados.
+
+```csharp
+dotnet ef migrations add AddFirstAndLastName --output-dir Data/Migrations
+dotnet ef database update
+
+```
