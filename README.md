@@ -1107,6 +1107,11 @@ Autenticação é o processo de verificar a identidade de um indivíduo. É sobr
    OpenId
    SAML
 
+Segurança extra na autenticação caso necessário:
+One Time Password(OTP)
+Two Factor Authentication(2FA)
+Email verification
+
 Utilizamos o Authentication Scheme e Authentication Handlers para saber qual das opcoes utilizar para preencher o User Property.
 
 2. Authentication Handlers:
@@ -1243,7 +1248,7 @@ Existem diversas estratégias para construir um sistema de autorização robusto
 
    - Role based Authorization:
      Similar ao Claim based porem utiliza o Roles ao invés do Claims.
-     Aqui voce pode usar o Roles diretamente no atributo [Authorize], sem precisar construi a Policy no Program.cs
+     Aqui voce pode usar o Roles diretamente no atributo [Authorize], sem precisar construir a Policy no Program.cs
 
      ```csharp
      [Authorize(Roles = "Admin")]
@@ -1252,7 +1257,7 @@ Existem diversas estratégias para construir um sistema de autorização robusto
      }
      ```
 
-     Voce tambem pode criar a Policy usando o RequireRole no Program.cs e usar a Policy ao invés do Roles no Controller.
+     Voce tambem pode criar a Policy usando o RequireRole no Program.cs e usar a Policy ao invés do Role no Controller.
 
      ```csharp
      builder.Services.AddAuthorization(options => {
