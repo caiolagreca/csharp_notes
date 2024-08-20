@@ -1270,13 +1270,77 @@ Existem diversas estratégias para construir um sistema de autorização robusto
      Role based Authorization existe por conta de compatibilidade com versões antigas, porém é melhor evitar usá-lo visto que pode ser descontinuado.
 
    - Policy based Authorization:
-     Role based e Claim based Authorization usam a Policy nos bastidores. Mas se possuirmos uma situação complexa, precisaremos construir uma Policy based Authorization Scheme personalizado.
-     Os blocos de construção da Policy Authorization são Policy (pode conter mais de um requirement), Requirement (define o Authorization Requirement) e Requirement Handler (contem a logica que checa o requirement e um requirement pode ter mais de um Handler).
+     Role based e Claim based Authorization usam a Policy nos bastidores. Mas se possuirmos uma situação complexa, precisaremos construir um Policy based Authorization Scheme personalizado.
+     Os blocos de construção da Policy Authorization são Policy (pode conter mais de um requirement), Requirement (define o Authorization Requirement) e Authorization Handler (contem a logica que checa o requirement e um requirement pode ter mais de um Handler).
+
+     1.POLICY
+     Policy com multiplas Claims:
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+     options.AddPolicy("SuperIT", policy => policy.RequireClaim("Permission", "IT").RequireClaim("IT"));
+     });
+     //Policy "SuperIT" exige que o usuario tenha uma Claim "Permission" com valor "IT" e uma Claim separada chamada "IT".
+     //O usuario deve satisfazer ambas as condições.
+     ```
+
+     Policy somente para usuarios autorizados:
+     Essa Policy é similar ao atributo [Authorize]
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+     options.AddPolicy("AuthUsers", policy => policy.RequireAuthenticatedUser());
+     });
+     ```
+
+     Policy usando Role:
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+     options.AddPolicy("AdminRole", policy => policy.RequireRole("AdminRole"));
+     });
+     ```
+
+     Policy usando User Name:
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+     options.AddPolicy("BobOnly", policy => policy.RequireUserName("Bob"));
+     });
+     ```
+
+     Policy personalizada usando funções:
+     Utilizada quando se há requisitos de autorização mais complexos
+
+     ```csharp
+     builder.Services.AddAuthorization(options => {
+     options.AddPolicy(
+        "SuperUser",
+        policyBuilder => policyBuilder.RequireAssertion(
+            context => context.User.HasClaim(claim => claim.Type == "Admin")
+                || context.User.HasClaim(claim => claim.Type == "IT")
+                || context.User.IsInRole("CEO"))
+     );
+     });
+     ```
+
+     2.AUTHORIZATION REQUIREMENT
+     Define uma coleção de condições que a Policy deve avaliar. Para que a Policy seja bem sucedida, deve satisfazer todos os requisitos.
+     É similar a condição AND. Se um dos requisitos falhar, então a Policy completa falha.
+
+     3.AUTHORIZATION HANDLER
+     Contém a lógica para checar se um Requirement é válido.
+     Um Authorization Requirement pode conter mais de um Authorization Handler.
+     Um Authorization Handler pode retornar um desses valores: Fail, Success, Do Nothing.
+     Se um dos Handlers falhar, então o Requirement falha, e a falha ocorre independente do resultados dos outros Handlers.
+     Se nenhum dos Handlers falhar, e ao menos um deles retornar Success, então o Requirement é Success.
+     Se nenhum dos Handlers retornar um valor, então o Requirement falha.
+     Todos os Handlers são invocados independentemente do resultado.
 
 2. Imperative Authorization: Resource-based authorization usando Policy
    O Authorization Middleware, no qual usa o atributo [Authorize] para checar as permissões, roda-o muito antes da execução da página ou do Action Method. Sendo assim, ele não tem acesso as informações ou recursos no qual a pagina ou Action Method opera.
    Exemplo: Em um documento que possui um Autor, somente esse autor pode edita-lo. Para implementar essa segurança, precisamos recuperar o documento do servidor, checar quem é o autor e então decidir se permite editar o documento ou não. Usando a Declarative Authorization anterior, com atributo [Authorize], não conseguimos lidar com essa situação.
-   Sendo assim, escrevemos o codigo para validar o usuario direto no método, injetando o Authorization Service no Controller/Page. Então usamos o método AuthorizationAsync para disparar manualmente uma autorização.
+   Sendo assim, através do Resource based authorization, escrevemos o codigo para validar o usuario direto no método, injetando o Authorization Service no Controller/Page. Então usamos o método AuthorizeAsync para disparar manualmente uma autorização.
 
    - Como funciona:
      O UseRouting() resolve as solicitações HTTP recebidas e constroi um Endpoint
@@ -1401,7 +1465,7 @@ O emissor não armazena o token. O armazenamento seguro do token é de responsab
 
 # O que sao Claims:
 
-Uma claim (ou "declaração") é uma afirmação sobre um usuário que pode ser usada para autenticação e autorização. As claims são pares chave-valor que descrevem atributos específicos de um usuário, como nome, email, role, e outras propriedades. Elas são usadas em sistemas de autenticação para fornecer informações sobre o usuário e determinar seus direitos de acesso.
+Uma claim (ou "declaração") é uma afirmação sobre um usuário que pode ser usada para autenticação e autorização. As claims são pares chave-valor que descrevem atributos específicos de um usuário, como nome, email, role, phoneNumber e outras propriedades. Elas são usadas em sistemas de autenticação para fornecer informações sobre o usuário e determinar seus direitos de acesso.
 Elas são incluídas em tokens de autenticação (como JWT) e são verificadas pelo servidor para determinar se um usuário tem permissão para acessar determinados recursos.
 
 Componentes de uma Claim:
