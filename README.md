@@ -1408,12 +1408,13 @@ O Header contém informações sobre o algoritmo que o emissor usa para gerar o 
 ```
 
 O Payload contem os Claims do usuario:
+Existem 3 tipos de Claims - Public, Registered (predefinidos) e Private
 
 ```csharp
 {
- “sub”: “1234567890”,
-“name”: “John Doe”,
-“iat”: 1516239022,
+"sub": "1234567890",
+"name": "John Doe",
+"iat": 1516239022,
 "role": "Admin",
 "userdefined":"Whatever"
 }
