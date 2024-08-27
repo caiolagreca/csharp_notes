@@ -1818,7 +1818,7 @@ A principal diferença é como os dados são armazenados e copiados. Tipos de va
               Use ViewModel mesmo para cenários simples. Isso ajuda a manter a consistência em todo o aplicativo
 
               ```csharp
-              //Por exemplo, no modelo de produto acima, o usuário precisa ver o nome da marca e o nome do fornecedor em vez do ID da marca e do ID do fornecedor.
+              //Por exemplo, no modelo de produto abaixo, o usuário precisa ver o nome da marca e o nome do fornecedor em vez do ID da marca e do ID do fornecedor.
               //Portanto, nosso View Model se torna
               public class ProductViewModel
               {
@@ -2683,6 +2683,51 @@ endpoints.MapGet("/", async context =>
     O Controller passa o Model para a View apropriada e passa o controle para a View para construir a resposta.
     A View gerará a resposta apropriada. A resposta pode ser um HTML, XML, Json ou um arquivo para download. Em seguida, ela o envia de volta ao usuário.
     O ciclo da request é concluído e o aplicativo aguarda nova interação do usuário, o que iniciará um novo ciclo.
+
+6.  Model Biding:
+    É o processo de mapear os dados postados sobre a requisição HTTP aos parametros do Action Method no Controller.
+    Esses parametros podem ser do tipo primitivo ou complexo.
+    Os dados da requisição HTTP podem ser de vários formatos. Podem estar contidos em campos de Forms HTML, parte dos valores de rota, podem ser parte de uma query string ou podem estar contido no body da requisição.
+    O Model Binder entra em ação logo antes da invocação do Action Method. Ele busca por uma correspondência no Form Data, Query String e requisições de parametros no HTTP request. Em seguida ele vicula os valores encontrados ao parametro de ação pelo nome.
+
+    Aqui está a lista de fontes de dados na ordem em que o model binding as procura:
+    1.HTML Form Values
+    2.Route Values
+    3.Query Strings
+    O Model Binder também pode procurar dados nas seguintes fontes, mas para fazer isso precisamos especificar o binding source explicitamente:
+    1.Request Body
+    2.Request Header
+    3.Services
+
+    Para que essa ligação funcione o nome da propriedade deve corresponder aos dados da solicitação e as propriedades devem ser definidas como públicas.
+    O Model Binder é criado pelo Model Binder Provider e deve implementar a interface IModelBinderProvider. O que significa que você pode criar seu próprio Model Binder.
+
+Se o Model Binder falhar ao tentar vincular os dados, ele não lança um erro mas atualiza o object ModelState com uma lista de erros e define a propriedade isValid como false. Ou seja, checar o ModelState.isValid nos diz se o model binding ocorreu com sucesso.
+
+O ASP.NET Core nos fornece vários atributos para controlar e escolher de qual fonte queremos receber os dados:
+
+- [FromForm]: Força o Model Binder a vincular o parametro aos campos do HTML Forms.
+
+```csharp
+[HttpPost]
+public IActionResult Create([FromForm] ProductEditModel model)
+{
+}
+```
+
+- [FromRoute]: Força o Model Binder a vincular o parametro aos dados da rota da requisição atual.
+
+- [FromQuery]: Força o Model Binder a vincular o parametro ao valor obtido da Query String.
+
+- [FromBody]: Força o Model Binder a vincular o parametro ao valor obtido da request body.
+  Os dados no corpo da solicitação vêm em diferentes formatos, incluindo JSON, XML etc. O Model Binder anaisa o header content-type para escolher a devida formatação para analisar os dados na requisição do body.
+  Por exemplo, quando o content-type é “application/json”, o model binder usa a classe JsonInputFormatter para analisar o request body e mapeá-lo para o parâmetro.
+
+- [FromHeader]: Mapeia os valores do request header para o parâmetro de ação.
+
+- [BindNever]: Informa ao Model Binder para nunca vincular a propriedade.
+
+- [BindRequired]: O oposto do BindNever. O campo marcado como BindRequired deve sempre estar presente no campo do formulário e o binding deve ocorrer, caso contrário, o ModelState.isValid é marcado como false.
 
 # Configuration:
 
