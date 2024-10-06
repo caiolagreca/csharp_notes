@@ -1501,6 +1501,61 @@ Lemos a ClaimsPrincipal no User Property do HttpContext object.
 Toda request que recebemos vai conter um HttpContext object. Esse objeto contem a informacao a respeito da requisicao HTTP atual.
 É o Authentication Middleware que preenche o User Property. Lembre-se de que registramos o Authentication Middleware no pipeline do Middleware usando o metodo UseAuthentication()
 
+# O que sao Roles:
+
+são grupos que categorizam usuários de acordo com suas permissões ou funções dentro de um sistema. Define um conjunto de permissões associadas a uma função ou posição, como "Admin", "Manager", ou "User". Elas representam um nível de acesso predefinido.
+são verificadas através de [Authorize] com a opção Roles, onde você pode garantir que um usuário pertencente a um determinado role possa acessar um recurso específico.
+Um role define quem pode fazer o quê no sistema, mas não armazena detalhes adicionais sobre o usuário.
+Exemplo prático: Em um sistema onde você tem diferentes níveis de usuários, você pode usar roles para definir quem pode acessar determinados recursos.
+Use roles quando você quiser definir permissões mais gerais baseadas nas funções dos usuários. Roles são úteis quando você tem diferentes categorias de usuários com diferentes níveis de acesso (como "Admin", "User", "Manager", etc.) e precisa de uma forma simples de controlar isso.
+
+```csharp
+[Authorize(Roles = "Admin")]
+public IActionResult GetAdminData()
+{
+    // Apenas usuários com role "Admin" podem acessar este método
+    return Ok("This is admin data");
+}
+```
+
+# Claims x Roles:
+
+1. Claims:
+   Definição - São declarações flexíveis sobre o usuário, que podem conter qualquer tipo de informação.
+   Tipos de Dados - Qualquer tipo de dado (nome, email, permissões, departamento, etc.).
+   Flexibilidade - Muito flexíveis, podem ser usadas para representar permissões, atributos e outros dados.
+   Verificação - Claims podem ser verificadas diretamente usando User.HasClaim().
+   Uso Comum - Usadas para informações personalizadas e permissões específicas.
+   Complexidade - Suporta regras de autorização mais complexas.
+   Armazenamento - Claims podem conter várias informações sobre o usuário.
+   Quando usar - precisa de mais flexibilidade e deseja armazenar informações adicionais sobre o usuário; Precisa criar regras de autorização mais complexas com base em informações variadas; Está lidando com permissões que não se encaixam facilmente em um sistema de roles, como permissões por nível de acesso ou detalhes contextuais.
+
+2. Roles:
+   Definição - Representam grupos que definem permissões com base em funções predefinidas.
+   Tipos de Dados - Simples funções, como "Admin", "Manager", "User".
+   Flexibilidade - Mais restritas, usadas apenas para definir funções de usuários.
+   Verificação - Roles são verificadas usando [Authorize(Roles = "RoleName")] ou User.IsInRole().
+   Uso Comum - Usadas para controle de acesso baseado em função/nível de usuário.
+   Complexidade - Mais simples, aplicando controle de acesso por função.
+   Armazenamento - Um usuário pode ter múltiplos roles, mas são mais limitadas em quantidade de dados.
+   Quando usar - O sistema tem funções predefinidas e você deseja garantir que usuários com determinadas funções possam acessar partes específicas do sistema; O controle de acesso é simples e baseado em funções, onde cada função tem um conjunto de permissões associadas.
+
+Usando Claims e Roles juntos:
+
+```csharp
+//Você pode usar Roles para controle geral e Claims para controle mais granular.
+[Authorize(Roles = "Admin")]
+public IActionResult GetAdminData()
+{
+    // Verifica uma claim adicional além do Role
+    if (User.HasClaim("CanEditOrders", "true"))
+    {
+        return Ok("Admin with edit permission");
+    }
+    return Forbid("Admin without edit permission");
+}
+```
+
 # Identity:
 
 é um sistema de associação com todos os recursos para criar e manter login do usuario. Usando a Identity API, você pode fazer login e logout de usuários, redefinir suas senhas, bloquear usuários e implementar Multi-Factor Authentication.
@@ -1544,6 +1599,27 @@ IdentityUserToken - AspNetUserTokens - serve para armazenar tokens recebidos de 
 IdentityUserRole - AspNetUserRoles - tabela contém os Roles atribuídos ao usuário
 IdentityRole - AspNetRoles - tabelas para armazenar os Roles.
 IdentityRoleClaim - AspNetRoleClaims - As Claims que são atribuídas ao Role.
+
+# UserManager x SignInManager:
+
+1. UserManager<TUser>
+   Eh um serviço que fornece várias operações relacionadas à gestão de usuários. Ele é responsável por tudo que envolve criação, atualização e gerenciamento de usuários no sistema, além de funcionalidades associadas a senhas, roles, claims, etc. O tipo genérico <TUser> geralmente é uma classe que herda de IdentityUser.
+   Cria e deleta usuários (CreateAsync, DeleteAsync).
+   Atualiza usuários (UpdateAsync).
+   Gerencia senhas (defini e valida senhas com CreateAsync, ChangePasswordAsync).
+   Busca usuários (por nome de usuário, email ou ID com FindByNameAsync, FindByEmailAsync).
+   Gerencia roles e claims associados a um usuário (AddToRoleAsync, AddClaimAsync).
+   Reseta e valida tokens de senha (gera e validar tokens para reset de senha).
+   Ou seja, tem seu foco no gerenciamento de contas de usuarios.
+
+2. SignInManager<TUser>
+   Eh um serviço que cuida do processo de autenticação dos usuários. Ele se baseia nas informações fornecidas pelo UserManager, como nome de usuário e senha, para autenticar os usuários e gerenciar o processo de login e logout.
+   Verifica a senha de um usuário (CheckPasswordSignInAsync).
+   Autentica um usuário e gera o ticket de autenticação (PasswordSignInAsync).
+   Autentica com diferentes mecanismos, como redes sociais (Google, Facebook), usando ExternalLoginSignInAsync.
+   Gerencia login com múltiplos fatores de autenticação (MFA).
+   Logout do usuário (SignOutAsync).
+   Ou seja, tem seu foco na autenticação e login/logout de usuários.
 
 # O que é Razor Pages:
 
@@ -2978,7 +3054,387 @@ O método na classe program.cs lê o valor da variavel ASPNETCORE_ENVIRONMENT be
 Por exemplo, se o ambiente atual for Desenvolvimento, então o appsettings.development.json é carregado. Se o ambiente for Produção, então ele usa oappsettings.production.json
 Portanto, podemos carregar diferentes configurações com base no ambiente ou aplicativo em execução.
 
+# LINQ:
+
+- AsQueryable():
+  converte uma coleção em um tipo que implementa a interface IQueryable<T>, permitindo que você construa e execute consultas mais complexas e otimizadas.
+  É útil principalmente em operações que envolvem bancos de dados, permitindo que as consultas sejam construídas e otimizadas antes de serem realmente executadas.
+  Permite que você faça consultas complexas sem carregar todos os dados na memória.
+
+  ```csharp
+  //Sem AsQueryable() (com IEnumerable): Aqui a consulta é executada imediatamente, e os dados são filtrados em memória
+  List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+  IEnumerable<int> evenNumbers = numbers.Where(n => n % 2 == 0); // Executa imediatamente
+
+  foreach (var number in evenNumbers)
+  {
+    Console.WriteLine(number);  // Mostra: 2, 4, 6, 8, 10
+  }
+
+  //Com AsQueryable() (com IQueryable): Aqui a consulta é deferida e pode ser otimizada se usada com um banco de dados:
+  List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+  IQueryable<int> queryableNumbers = numbers.AsQueryable(); // Converte para IQueryable
+
+  var evenNumbers = queryableNumbers.Where(n => n % 2 == 0); // A consulta só será executada quando você precisar dos dados
+
+  foreach (var number in evenNumbers)
+  {
+    Console.WriteLine(number);  // Mostra: 2, 4, 6, 8, 10
+  }
+  ```
+
+# Deferred Exection x Eager Execution (LINQ):
+
+1. Deferred Execution permite que a avaliação de uma consulta ou operação não ocorra imediatamente, mas apenas quando os resultados são necessários.
+   Quando você define uma consulta LINQ, o código não faz a consulta imediatamente. Em vez disso, a consulta é apenas "preparada" e armazenada em memória. A consulta só será executada quando você iterar sobre os resultados (por exemplo, com um foreach ou chamando métodos como ToList(), Count(), etc.).
+   Beneficios:
+   Eficiência - evita processamentos desnecessários.
+   Mudança nos dados - Como a consulta não é executada imediatamente, se os dados da fonte forem alterados entre a definição e a execução, a consulta refletirá essas alterações.
+
+   ```csharp
+   var numbers = new List<int> {1, 2, 3, 4, 5, 6};
+   // Definindo consulta LINQ (deferred execution):
+   var evenNumbers = numbers.Where(n => n%2 == 0);
+   // A consulta é executada aqui, quando você realmente itera sobre os dados:
+   foreach (var number in evenNumbers) {
+    console.WriteLine(number); //Output: 2, 4, 6
+   }
+   ```
+
+2. Eager Execution ocorre quando a consulta é executada imediatamente, e os resultados são armazenados na memória assim que a consulta é definida
+   Métodos como ToList() e ToArray() forçam a eager execution, pois eles materializam a consulta no momento da chamada.
+   Quando usar:
+   Quando você deseja definir consultas que podem ser ajustadas ou filtradas antes de realmente executá-las.
+   Em cenários onde os dados podem mudar ao longo do tempo e você deseja garantir que a consulta seja avaliada com os dados mais atualizados.
+
+   ```csharp
+   var numbers = new List<int> {1,2,3,4,5,6};
+   // Executa imediatamente:
+   var evenNumbersList = numbers.Where(n=> n%2 == 0).ToList();
+   // A consulta já foi executada e os resultados armazenados na lista
+   ```
+
+# Quando herdar a classe Controller ou ControllerBase:
+
+1. Controller:
+   Inclui todas as funcionalidades da classe ControllerBase, além de algumas funcionalidades adicionais usadas principalmente em aplicações web que incluem renderização de páginas HTML ou manipulação de respostas no formato MVC.
+   Essas funcionalidades adicionais incluem:
+   Métodos auxiliares como View(), ViewComponent(), PartialView(), RedirectToAction(), e File(), que são úteis para criar views, redirecionamentos ou manipular arquivos.
+   Usar quando estiver desenvolvendo uma aplicação MVC que gera páginas HTML ou usa views.
+
+2. ControllerBase:
+   Fornece apenas os recursos necessários para APIs RESTful, ou seja, retorna dados no formato JSON, XML, etc., sem os métodos auxiliares relacionados a views.
+   As funcionalidades incluem:
+   Métodos como Ok(), NotFound(), BadRequest(), CreatedAtAction(), e outros que são usados principalmente para retornar respostas HTTP em APIs.
+   Usar quando estiver desenvolvendo uma API RESTful e não precisa de renderização de views, pois ele é mais simples e otimizado para APIs.
+
+# Serializar e Desserializar JSON:
+
+Serialização é o processo de pegar um objeto ou estrutura de dados que está na memória e convertê-lo para uma representação que pode ser facilmente transmitida ou armazenada. Nesse caso, a representação escolhida é o JSON, um formato baseado em texto.
+
+```csharp
+var stock = new Stock {
+    Id = 1,
+    Symbol = "AAPL",
+    CompanyName = "Apple Inc.",
+    Purchase = 145.32M
+};
+//Depois de serializado em JSON, ficaria assim:
+{
+    "Id": 1,
+    "Symbol": "AAPL",
+    "CompanyName": "Apple Inc.",
+    "Purchase": 145.32
+}
+```
+
+Desserialização é o processo inverso: pegar um texto JSON e convertê-lo de volta para um objeto ou estrutura de dados em memória.
+
+# CORS (Cross-Origin Resource Sharing):
+
+Eh um mecanismo de segurança que permite que um servidor determine quais origens (dominios) diferentes podem acessar seus recursos, como APIs, imagens, ou scripts. Ele foi criado para evitar problemas de segurança ao fazer solicitações HTTP entre diferentes origens.
+
+Por padrão, navegadores bloqueiam requisições HTTP entre diferentes domínios por questões de segurança. Isso significa que, se você tem uma aplicação rodando em https://meusite.com e tenta acessar uma API que está em https://api.terceiro.com, o navegador pode bloquear essa requisição devido à política de mesma origem (Same-Origin Policy). Essa política de segurança impede que scripts rodando em uma página em um dominio acessem recursos em outro dominio, o que protege o usuário de ataques como CSRF (Cross-Site Request Forgery).
+
+Como funciona:
+CORS permite que o servidor declare explicitamente quais domínios podem acessar seus recursos. Isso é feito configurando cabeçalhos HTTP específicos. Quando uma requisição entre diferentes origens é feita, o navegador envia uma requisição preflight (verificação preliminar), que inclui o método HTTP (como GET, POST) e os cabeçalhos que a aplicação deseja usar. Se o servidor permitir, ele responde com os cabeçalhos CORS necessários e a requisição é liberada.
+
+Cabeçalhos CORS comuns:
+Access-Control-Allow-Origin: Define quais domínios podem acessar os recursos. Pode ser um domínio específico, ou o valor "\*" para permitir qualquer origem.
+Access-Control-Allow-Methods: Especifica quais métodos HTTP (GET, POST, PUT, etc.) são permitidos.
+Access-Control-Allow-Headers: Lista os cabeçalhos que podem ser usados na requisição.
+Access-Control-Allow-Credentials: Indica se a requisição pode incluir cookies ou outros credenciais.
+
+# Entity Framework Core:
+
+Quando instalamos um Database provider, como o SQLServer (Microsoft.EntityFrameworkCore.SqlServer), automaticamente eh instalado o Microsoft.EntityFrameworkCore.
+O package Microsoft.EntityFrameworkCore.Tools contem ferramentas de CLI. Essas ferramentas contem o comando para criar e aplicar migracoes, gerar codigo para um modelo com base em um DB existentem, etc.
+
+Entity class sao os models utilizados pelo EF Core para acessar dados. O EF Core mapeia essas Entity Classes para uma tabela no DB.
+
+1. DBContext:
+   A classe DBContext gerencia as Entity Classes. Eh responsavel por conectar, consultar e atualizar o DB, alem de possuir as informacoes necessarias para configurar o DB. Eh basicamente a conexao entre as Entities e o DB.
+
+   No DBContext, passamos uma instancia do DbContextOptions como parametro do Constructor. O DbContextOption contem informacoes de configuracoes como o tipo de DB a ser usado, string de conexoes etc.
+   O DbContextOptions também pode ser configurado usando o OnConfiguring método. Este método obtém o DbContextOptionsBuilder como seu argumento. Ele é então usado para criar o DbContextOptions.
+   O OnModelCreating eh o método onde você pode configurar o modelo. A instância do ModelBuilder eh passado como argumento para o metodo onModelCreating. O ModelBuilder fornece a API, que é usada para configurar a forma, o tipo de dados, os relacionamentos entre os modelos etc.
+   Por fim, definimos a propriedade DbSet para cada entidade (tabela de banco de dados). No exemplo abaixo, Categorias e produtos representam a tabela de banco de dados Categoria e Produto.
+
+```csharp
+//Para usar DBContext precisamos criar a context class que herda da classe base DbContext
+public class EFContext : DbContext
+{
+    public EFContext(DbContextOptions options) : base(options)
+    {
+    }
+
+    ////O OnConfiguring método nos permite configurar o DBContext. O EF Core chama esse método quando instancia o contexto pela primeira vez. É aqui que configuramos a classe Context. Por exemplo, configuramos os provedores de banco de dados, a string de conexão a ser usada, etc.
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) // //O DbContextOptionsBuilder fornece a API para configurar o DBContext.
+    {
+      //Voce pode configurar o provedor do Db (SQL Server nesse caso) por aqui ou no Program.cs
+       if (!optionsBuilder.IsConfigured)
+        {
+          //// O método UseSqlServer define o SQL Server como nosso provedor de banco de dados. O primeiro argumento para o UseSqlServer método é a string de conexão a ser usada.
+            optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=EFCore;Trusted_Connection=True;MultipleActiveResultSets=true");
+        }
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+    }
+
+    //Criar o Model (Entity Type) não é suficiente para mapeá-lo para o banco de dados. Precisamos criar uma propriedade DbSet para cada Model na Context Class. O EF Core inclui apenas os tipos que têm uma propriedade DbSet no model. O DBSet fornece métodos como Add, Attach, remove, et. nos Entity Types. A classe Context mapeia essas operações em uma consulta SQL e a executa no banco de dados usando os Database Providers.
+    public DbSet<Category> Categories { get; set; }
+    public DbSet<Product> Products { get; set; }
+
+}
+```
+
+2.  Data Annotations:
+    Sao os [Attributes] que aplicamos nas classes/models ou nas propriedades das classes/models.
+    Fornecem metadata adicionais sobre as classes ou propriedades.
+
+    Sao dividos em dois grupos:
+
+    - Data Modeling Attributes:
+      Estao presentes no namespace System.ComponentModel.DataAnnotations.Schema
+      Especificam o schema do banco de dados.
+
+    - Validation Related Attributes:
+      Estao presentes no namespace System.ComponentModel.DataAnnotations
+      Usamos esses atributos para impor regras de validação para as propriedades da entidade.
+      Esses atributos também definem o tamanho, se pode ser null, a chave primária, etc.
+
+3.  Fluent API:
+    Eh uma maneira de configurar as classes do Model.
+    Utiliza a instancia do ModelBuilder para configurar o domain model. Obtemos a referencia do ModelBuilder ao sobrescrever (override) o metodo Onmodelcreating do DbContext.
+    Fluent API torna mais flexivel e gera maior poder ao desenvolvedor para configurar o DB comparado ao EF Core Conventions ou o Data Annotations.
+    ModelBuilder constroi os modelos iniciais atraves da entity class que possui a propriedade DbSet na classe Context (derivada da classe DbContext).
+
+    Os metodos disponiveis para Fluent API sao classificados em 3 categorias:
+
+    - Model Wide Configuration (database): Sao aplicados para o Model inteiro. Ex: modelBuilder.HasDefaultSchema("Admin");
+
+      ```csharp
+      protected override void OnModelCreating(ModelBuilder modelBuilder)
+      {
+      // Definir um schema padrão para todas as entidades
+      modelBuilder.HasDefaultSchema("MySchema");
+      // Configurar a geração de identidade de forma global
+      modelBuilder.UseIdentityColumns();
+      }
+      ```
+
+      HasDefaultSchema - Configura o esquema padrão no qual os objetos do DB devem ser criados, caso nenhum esquema seja configurado explicitamente.
+      RegisterEntityType - Registra um tipo de entidade como parte do modelo.
+      HasAnnotation - Adiciona ou atualiza uma annotation no modelo. Se uma annotation com a chave especificada em annotation já existir, seu valor será atualizado.
+      HasChangeTrackingStrategy - Configura o ChangeTrackingStrategy padrão a ser usado para este modelo. Esta estratégia indica como o contexto detecta alterações em propriedades para uma instância de um tipo de entidade.
+      Ignore - Exclui o tipo de entidade fornecido do modelo. Este método é normalmente usado para remover tipos do modelo que foram adicionados por convenção.
+      HasDbFunction - Configura uma função de banco de dados ao direcionar um banco de dados relacional.
+      HasSequence - Configura uma sequência de banco de dados ao direcionar um banco de dados relacional.
+
+    - Entity Configuration (table): Executada utilizando o metodo Entity().
+      O metodo Entity retorna o objeto EntityTypeBuilder para configurar as Entities.
+
+      ```csharp
+      protected override void OnModelCreating(ModelBuilder modelBuilder)
+      {
+      modelBuilder.Entity<Employee>()
+      .ToTable("tbl_Employee") // Configuração de entidade
+      .HasKey(e => e.EmployeeId); // Configuração de entidade
+      }
+      ```
+
+      Ignore - Exclue a entidade do Modelo.
+      ToTable - Define o nome da tabela para o tipo de entidade.
+      HasKey - Define as propriedades que compõem a chave primária para este tipo de entidade.
+      HasMany - Configura um relacionamento onde este tipo de entidade tem uma coleção que contém instâncias do outro tipo no relacionamento.
+      HasOne - Configura um relacionamento em que esse tipo de entidade tem uma referência que aponta para uma única instância do outro tipo no relacionamento.
+      HasAlternateKey - Adiciona ou atualiza uma anotação no tipo de entidade. Se uma anotação com a chave especificada na anotação já existir, seu valor será atualizado
+      HasChangeTrackingStrategy - Configura a ChangeTrackingStrategy a ser usada para esse tipo de entidade. Essa estratégia indica como o contexto detecta alterações em propriedades para uma instância do tipo de entidade.
+      HasIndex - Configura um índice nas propriedades especificadas. Se houver um índice existente no conjunto de propriedades fornecido, o índice existente será retornado para configuração.
+      OwnsOne - Configura um relacionamento em que a entidade de destino é de propriedade de (ou parte de) esta entidade. O valor da chave da entidade de destino é sempre propagado da entidade à qual pertence.
+
+    - Property configuration (property):
+
+    ```csharp
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+    modelBuilder.Entity<Employee>()
+    .Property(e => e.Name)
+    .HasMaxLength(100) // Configuração de propriedade
+    .IsRequired(); // Configuração de propriedade
+    }
+    ```
+
+    O objeto EntityTypeBuilder retorna o metodo Property. Esse metodo eh utilizado para configurar os atributos da propriedade da entidade selecionada. Esse metodo Property retorna o objeto PropertyBuilder, no qual eh especifico para o tipo que esta sendo configurado.
+    Ignore - Exclui a Propriedade do Modelo.
+    HasColumnName - Configura o nome da coluna do banco de dados da propriedade.
+    HasColumnType - Configura o tipo de dados da coluna do banco de dados da propriedade.
+    HasDefaultValue - Configura o valor padrão para a coluna para a qual a propriedade mapeia ao direcionar um banco de dados relacional.
+    HasComputedColumnSql - Configura a propriedade para mapear para uma coluna computada ao direcionar um banco de dados relacional.
+    HasField - Especifica o campo de apoio a ser usado com uma propriedade.
+    HasMaxLength - Especifica o comprimento máximo da propriedade.
+    IsConcurrencyToken - Permite que a propriedade seja usada em atualizações de simultaneidade otimistas
+    IsFixedLength - Configura a propriedade para ter comprimento fixo. Use HasMaxLength para definir o comprimento ao qual a propriedade é fixada.
+    IsMaxLength - Configura a propriedade para permitir o comprimento máximo suportado pelo provedor de banco de dados
+    IsReguired - Especifica a coluna do banco de dados como não anulável.
+    IsUnicode - Configura a propriedade para suportar conteúdo de string Unicode.
+    ValueGeneratedNever - Configura uma propriedade para nunca ter um valor gerado quando uma instância desse tipo de entidade é salva.
+    ValueGeneratedOnAdd - Configura uma propriedade para ter um valor gerado somente ao salvar uma nova entidade, a menos que um valor não nulo e não temporário tenha sido definido, em cujo caso o valor definido será salvo.
+    ValueGeneratedOnAddOrUpdate - Configura uma propriedade para ter um valor gerado ao salvar uma entidade nova ou existente.
+    ValueGeneratedOnUpdate - Configura uma propriedade para ter um valor gerado ao salvar uma entidade existente.
+
+```csharp
+using Microsoft.EntityFrameworkCore;
+
+namespace EFCoreFluentAPI
+{
+public class EFContext : DbContext
+{
+private const string connectionString = "Server=(localdb)\\mssqllocaldb;Database=EFCoreFluentAPI;Trusted_Connection=True;";
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+          //Estamos alterando o Schema do DB para "Admin"
+          modelBuilder.HasDefaultSchema("Admin");
+
+          //Encadeamento de metodos eh um dos principais recursos do Fluent API. Abaixo estamos renomeando a tabela e definindo EmployeeID como chave primaria.
+          modelBuilder.Entity<Employee>()
+            .ToTable("mstEmployee")
+            .HasKey(e => e.EmployeeID);
+        }
+
+        public DbSet<Employee> Employees { get; set; }
+    }
+}
+```
+
+IEntityTypeConfiguration<T>:
+Permite definir configurações para entidades de maneira modular e organizada. Em vez de configurar todas as entidades dentro do método OnModelCreating no DbContext, usamos essa interface para encapsular a lógica de configuração de uma entidade em uma classe separada.
+Para utilizar essa interface, precisamos criar uma classe separada para cada entidade que desejamos configurar. Em cada classe, implementamos o método Configure e definimos todas as configurações específicas daquela entidade.
+Vantagens: Nao sobrecarrega o metodo OnModelCreating no DbContext; Pode reutilizar amesma configuracao da entidade em diferentes Contexts de DB; Manutencao mais facil; Configuracoes das entidades isoladas.
+
+Exemplo com várias entidades:
+
+```csharp
+//Definindo as entidades
+public class Employee
+{
+    public int EmployeeId { get; set; }
+    public string Name { get; set; }
+    public int DepartmentId { get; set; }
+    public Department Department { get; set; }
+}
+
+/* --- ANOTHER FILE --- */
+
+public class Department
+{
+    public int DepartmentId { get; set; }
+    public string DepartmentName { get; set; }
+    public List<Employee> Employees { get; set; }
+}
+
+/* --- ANOTHER FILE --- */
+
+//Criando uma classe de configuração para a entidade
+public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
+{
+  //Configure eh o único método da interface, e ele recebe um EntityTypeBuilder<T>, que permite configurar aspectos da entidade, como chaves, relacionamentos, tabelas, propriedades, etc.
+  public void Configure(EntityTypeBuilder<Employee> builder)
+  {
+        builder.HasKey(e => e.EmployeeId);
+        builder.ToTable("tbl_Employee");
+        builder.Property(e => e.Name)
+               .IsRequired()
+               .HasMaxLength(100);
+        builder.HasOne(e => e.Department)
+               .WithMany(d => d.Employees)
+               .HasForeignKey(e => e.DepartmentId);
+  }
+}
+
+/* --- ANOTHER FILE --- */
+
+public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
+{
+    public void Configure(EntityTypeBuilder<Department> builder)
+    {
+        builder.HasKey(d => d.DepartmentId);
+        builder.ToTable("tbl_Department");
+        builder.Property(d => d.DepartmentName)
+               .IsRequired()
+               .HasMaxLength(100);
+    }
+}
+
+/* --- ANOTHER FILE --- */
+
+//Aplicando a configuração no DbContext
+public class ApplicationDbContext : DbContext
+{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Aplicando as configuracoes das entidades
+        modelBuilder.ApplyConfiguration(new EmployeeConfiguration());
+        modelBuilder.ApplyConfiguration(new DepartmentConfiguration());
+    }
+
+    public DbSet<Employee> Employees { get; set; }
+    public DbSet<Department> Departments { get; set; }
+}
+
+/* OU PODEMOS USAR ApplyConfigurationsFromAssembly */
+
+public class ApplicationDbContext : DbContext
+{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        // Aplica automaticamente todas as configurações encontradas no assembly atual. Torna mais eficiente pois nao precisa registrar todas as configuracoes das entidades manualmente uma por uma.
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
+
+    public DbSet<Employee> Employees { get; set; }
+    public DbSet<Department> Departments { get; set; }
+}
+
+```
+
 # Extra Notes:
+
+- Fazer aplicacao atualizar automaticamente:
+
+```csharp
+dotnet watch run
+```
 
 - A static method can be accessed without creating an object of the class, while public methods can only be accessed by objects.
 
@@ -3020,4 +3476,13 @@ dotnet ef database update
 dotnet ef migrations add AddFirstAndLastName --output-dir Data/Migrations
 dotnet ef database update
 
+```
+
+- Removendo itens indesejados do github (que nao deveriam ser commitados por conta do gitignore) e refazendo o push apos corrigi-lo:
+
+```bash
+git rm -r --cached .
+git add .
+git commit -m "explanation"
+git push
 ```
